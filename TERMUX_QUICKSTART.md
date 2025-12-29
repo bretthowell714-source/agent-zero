@@ -1,13 +1,42 @@
 # Agent Zero - Termux Quick Start ⚡
 
-Get Agent Zero running on your Android device in ~5 minutes!
+Get Agent Zero running on your Android device in ~10 minutes!
+
+## Prerequisites
+
+Open Termux and run:
+
+```bash
+pkg install git
+```
 
 ## Fast Track Installation
 
-### 1. One-Line Setup (Automated)
+### Option A: Already Have Agent Zero?
+
+If you already have the code:
 
 ```bash
-cd ~/agent-zero && bash termux-setup.sh
+cd agent-zero  # or wherever you have it
+bash termux-setup.sh
+```
+
+Then skip to step 3.
+
+### Option B: Fresh Install
+
+### 1. Clone Agent Zero Repository
+
+```bash
+cd ~
+git clone https://github.com/frdel/agent-zero.git
+cd agent-zero
+```
+
+### 2. Run Automated Setup Script
+
+```bash
+bash termux-setup.sh
 ```
 
 This script will:
@@ -18,7 +47,7 @@ This script will:
 
 **Time:** ~10-15 minutes (depending on internet speed)
 
-### 2. Add Your API Key
+### 3. Add Your API Key
 
 After setup completes, add your API key:
 
@@ -35,7 +64,7 @@ Save: `Ctrl+X` → `Y` → `Enter`
 
 **Get free Groq API key:** https://console.groq.com/
 
-### 3. Configure Model (Optional)
+### 4. Configure Model (Optional)
 
 Edit main.py to use Groq:
 
@@ -48,7 +77,7 @@ Change line ~14 to:
 chat_llm = models.get_groq_llama70b(temperature=0.2)
 ```
 
-### 4. Run Agent Zero!
+### 5. Run Agent Zero!
 
 ```bash
 python main.py
