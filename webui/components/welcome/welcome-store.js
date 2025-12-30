@@ -1,8 +1,8 @@
-import { createStore } from "/js/AlpineStore.js";
-import { getContext } from "/index.js";
-import { store as chatsStore } from "/components/sidebar/chats/chats-store.js";
-import { store as memoryStore } from "/components/settings/memory/memory-dashboard-store.js";
-import { store as projectsStore } from "/components/projects/projects-store.js";
+import { createStore } from '/js/AlpineStore.js';
+import { getContext } from '/index.js';
+import { store as chatsStore } from '/components/sidebar/chats/chats-store.js';
+import { store as memoryStore } from '/components/settings/memory/memory-dashboard-store.js';
+import { store as projectsStore } from '/components/projects/projects-store.js';
 
 const model = {
   // State
@@ -37,32 +37,33 @@ const model = {
   // Execute an action by ID
   executeAction(actionId) {
     switch (actionId) {
-      case "new-chat":
+      case 'new-chat':
         chatsStore.newChat();
         break;
-      case "settings":
+      case 'settings': {
         // Open settings modal
-        const settingsButton = document.getElementById("settings");
+        const settingsButton = document.getElementById('settings');
         if (settingsButton) {
           settingsButton.click();
         }
         break;
-      case "projects":
+      }
+      case 'projects':
         projectsStore.openProjectsModal();
         break;
-      case "memory":
+      case 'memory':
         memoryStore.openModal();
         break;
-      case "website":
-        window.open("https://agent-zero.ai", "_blank");
+      case 'website':
+        window.open('https://agent-zero.ai', '_blank');
         break;
-      case "github":
-        window.open("https://github.com/agent0ai/agent-zero", "_blank");
+      case 'github':
+        window.open('https://github.com/agent0ai/agent-zero', '_blank');
         break;
     }
   },
 };
 
 // Create and export the store
-const store = createStore("welcomeStore", model);
+const store = createStore('welcomeStore', model);
 export { store };

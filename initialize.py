@@ -2,6 +2,10 @@ from agent import AgentConfig
 import models
 from python.helpers import runtime, settings, defer
 from python.helpers.print_style import PrintStyle
+from opentelemetry import trace
+from opentelemetry.sdk.trace import TracerProvider
+from opentelemetry.sdk.trace.export import BatchSpanProcessor
+from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
 
 
 def initialize_agent(override_settings: dict | None = None):
@@ -167,3 +171,17 @@ def _set_runtime_config(config: AgentConfig, set: settings.Settings):
     for key, value in ssh_conf.items():
         if hasattr(config, key):
             setattr(config, key, value)
+
+# Set up OpenTelemetry Tracer Provider
+trace.set_tracer_provider(TracerProvider())
+tracer_provider = trace.get_tracer_provider()
+
+# Configure OTLP Exporter
+otlp_exporter = OTLPSpanExporter(endpoint="http://localhost:4317")
+span_processor = BatchSpanProcessor(otlp_exporter)
+tracer_provider.add_span_processor(span_processor) # pyright: ignore[reportAttributeAccessIssue]
+
+# Example tracer usage
+tracer = trace.get_tracer(__name__)
+with tracer.start_as_current_span("initialize-span"):
+    print("Tracing initialized.")

@@ -1,6 +1,6 @@
-import { createStore } from "/js/AlpineStore.js";
-import { fetchApi } from "/js/api.js";
-import { store as imageViewerStore } from "../../modals/image-viewer/image-viewer-store.js";
+import { createStore } from '/js/AlpineStore.js';
+import { fetchApi } from '/js/api.js';
+import { store as imageViewerStore } from '../../modals/image-viewer/image-viewer-store.js';
 
 const model = {
   // State properties
@@ -68,11 +68,11 @@ const model = {
 
   // Setup drag and drop event handlers
   setupDragDropHandlers() {
-    console.log("Setting up drag and drop handlers...");
+    console.log('Setting up drag and drop handlers...');
     let dragCounter = 0;
 
     // Prevent default drag behaviors
-    ["dragenter", "dragover", "dragleave", "drop"].forEach((eventName) => {
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach((eventName) => {
       document.addEventListener(
         eventName,
         (e) => {
@@ -85,12 +85,12 @@ const model = {
 
     // Handle drag enter
     document.addEventListener(
-      "dragenter",
+      'dragenter',
       (e) => {
-        console.log("Drag enter detected");
+        console.log('Drag enter detected');
         dragCounter++;
         if (dragCounter === 1) {
-          console.log("Showing drag drop overlay");
+          console.log('Showing drag drop overlay');
           this.showDragDropOverlay();
         }
       },
@@ -99,7 +99,7 @@ const model = {
 
     // Handle drag leave
     document.addEventListener(
-      "dragleave",
+      'dragleave',
       (e) => {
         dragCounter--;
         if (dragCounter === 0) {
@@ -111,9 +111,9 @@ const model = {
 
     // Handle drop
     document.addEventListener(
-      "drop",
+      'drop',
       (e) => {
-        console.log("Drop detected with files:", e.dataTransfer.files.length);
+        console.log('Drop detected with files:', e.dataTransfer.files.length);
         dragCounter = 0;
         this.hideDragDropOverlay();
 
@@ -126,43 +126,38 @@ const model = {
 
   // Setup paste event handler for clipboard images
   setupPasteHandler() {
-    console.log("Setting up paste handler...");
-    document.addEventListener("paste", (e) => {
-      console.log("Paste event detected, target:", e.target.tagName);
+    console.log('Setting up paste handler...');
+    document.addEventListener('paste', (e) => {
+      console.log('Paste event detected, target:', e.target.tagName);
 
       const items = e.clipboardData.items;
       let imageFound = false;
-      console.log("Checking clipboard items:", items.length);
+      console.log('Checking clipboard items:', items.length);
 
       // First, check if there are any images in the clipboard
       for (let i = 0; i < items.length; i++) {
         const item = items[i];
-        if (item.type.indexOf("image") !== -1) {
+        if (item.type.indexOf('image') !== -1) {
           imageFound = true;
           const blob = item.getAsFile();
           if (blob) {
             e.preventDefault(); // Prevent default paste behavior for images
             this.handleClipboardImage(blob);
-            console.log("Image detected in clipboard, processing...");
+            console.log('Image detected in clipboard, processing...');
           }
           break; // Only handle the first image found
         }
       }
 
       // If no images found and we're in an input field, let normal text paste happen
-      if (
-        !imageFound &&
-        (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA")
-      ) {
-        console.log(
-          "No images in clipboard, allowing normal text paste in input field"
-        );
+      if (!imageFound && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) {
+        console.log('No images in clipboard, allowing normal text paste in input field');
         return;
       }
 
       // If no images found and not in input field, do nothing
       if (!imageFound) {
-        console.log("No images in clipboard");
+        console.log('No images in clipboard');
       }
     });
   },
@@ -175,14 +170,14 @@ const model = {
       const filename = `clipboard-${guid}.png`;
 
       // Create file object from blob
-      const file = new File([blob], filename, { type: "image/png" });
+      const file = new File([blob], filename, { type: 'image/png' });
 
       // Create attachment object
       const attachment = {
         file: file,
-        type: "image",
+        type: 'image',
         name: filename,
-        extension: "png",
+        extension: 'png',
         displayInfo: this.getAttachmentDisplayInfo(file),
       };
 
@@ -195,9 +190,9 @@ const model = {
       reader.readAsDataURL(file);
 
       // Show success feedback
-      console.log("Clipboard image pasted successfully:", filename);
+      console.log('Clipboard image pasted successfully:', filename);
     } catch (error) {
-      console.error("Failed to handle clipboard image:", error);
+      console.error('Failed to handle clipboard image:', error);
     }
   },
 
@@ -205,22 +200,20 @@ const model = {
   handleFileUpload(event) {
     const files = event.target.files;
     this.handleFiles(files);
-    event.target.value = ""; // clear uploader selection to fix issue where same file is ignored the second time
+    event.target.value = ''; // clear uploader selection to fix issue where same file is ignored the second time
   },
 
   // File handling logic (moved from index.js)
   handleFiles(files) {
-    console.log("handleFiles called with", files.length, "files");
+    console.log('handleFiles called with', files.length, 'files');
     Array.from(files).forEach((file) => {
-      console.log("Processing file:", file.name, file.type);
-      const ext = file.name.split(".").pop().toLowerCase();
-      const isImage = ["jpg", "jpeg", "png", "bmp", "gif", "webp", "svg"].includes(
-        ext
-      );
+      console.log('Processing file:', file.name, file.type);
+      const ext = file.name.split('.').pop().toLowerCase();
+      const isImage = ['jpg', 'jpeg', 'png', 'bmp', 'gif', 'webp', 'svg'].includes(ext);
 
       const attachment = {
         file: file,
-        type: isImage ? "image" : "file",
+        type: isImage ? 'image' : 'file',
         name: file.name,
         extension: ext,
         displayInfo: this.getAttachmentDisplayInfo(file),
@@ -244,7 +237,7 @@ const model = {
   // Get attachments for sending message
   getAttachmentsForSending() {
     return this.attachments.map((attachment) => {
-      if (attachment.type === "image") {
+      if (attachment.type === 'image') {
         return {
           ...attachment,
           url: URL.createObjectURL(attachment.file),
@@ -268,20 +261,20 @@ const model = {
 
   // Check if file is an image based on extension
   isImageFile(filename) {
-    const imageExtensions = ["jpg", "jpeg", "png", "gif", "bmp", "webp", "svg"];
-    const extension = filename.split(".").pop().toLowerCase();
+    const imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp', 'svg'];
+    const extension = filename.split('.').pop().toLowerCase();
     return imageExtensions.includes(extension);
   },
 
   // Get attachment preview URL (server URL for persistence, blob URL for current session)
   getAttachmentPreviewUrl(attachment) {
     // If attachment has a name and we're dealing with a server-stored file
-    if (typeof attachment === "string") {
+    if (typeof attachment === 'string') {
       // attachment is just a filename (from loaded chat)
       return this.getServerImgUrl(attachment);
     } else if (attachment.name && attachment.file) {
       // attachment is an object from current session
-      if (attachment.type === "image") {
+      if (attachment.type === 'image') {
         // For images, use blob URL for current session preview
         return attachment.url || URL.createObjectURL(attachment.file);
       } else {
@@ -293,53 +286,53 @@ const model = {
   },
 
   getFilePreviewUrl(filename) {
-    const extension = filename.split(".").pop().toLowerCase();
+    const extension = filename.split('.').pop().toLowerCase();
     const types = {
       // Archive files
-      zip: "archive",
-      rar: "archive",
-      "7z": "archive",
-      tar: "archive",
-      gz: "archive",
+      zip: 'archive',
+      rar: 'archive',
+      '7z': 'archive',
+      tar: 'archive',
+      gz: 'archive',
       // Document files
-      pdf: "document",
-      doc: "document",
-      docx: "document",
-      txt: "document",
-      rtf: "document",
-      odt: "document",
+      pdf: 'document',
+      doc: 'document',
+      docx: 'document',
+      txt: 'document',
+      rtf: 'document',
+      odt: 'document',
       // Code files
-      py: "code",
-      js: "code",
-      html: "code",
-      css: "code",
-      json: "code",
-      xml: "code",
-      md: "code",
-      yml: "code",
-      yaml: "code",
-      sql: "code",
-      sh: "code",
-      bat: "code",
+      py: 'code',
+      js: 'code',
+      html: 'code',
+      css: 'code',
+      json: 'code',
+      xml: 'code',
+      md: 'code',
+      yml: 'code',
+      yaml: 'code',
+      sql: 'code',
+      sh: 'code',
+      bat: 'code',
       // Spreadsheet files
-      xls: "document",
-      xlsx: "document",
-      csv: "document",
+      xls: 'document',
+      xlsx: 'document',
+      csv: 'document',
       // Presentation files
-      ppt: "document",
-      pptx: "document",
-      odp: "document",
+      ppt: 'document',
+      pptx: 'document',
+      odp: 'document',
     };
-    const type = types[extension] || "file";
+    const type = types[extension] || 'file';
     return `/public/${type}.svg`;
   },
 
   // Enhanced method to get attachment display info for UI
   getAttachmentDisplayInfo(attachment) {
-    if (typeof attachment === "string") {
+    if (typeof attachment === 'string') {
       // attachment is filename only (from persistent storage)
       const filename = attachment;
-      const extension = filename.split(".").pop();
+      const extension = filename.split('.').pop();
       const isImage = this.isImageFile(filename);
       const previewUrl = isImage
         ? this.getServerImgUrl(filename)
@@ -362,17 +355,17 @@ const model = {
       // attachment is object (from current session)
       const isImage = this.isImageFile(attachment.name);
       const filename = attachment.name;
-      const extension = filename.split(".").pop() || "";
+      const extension = filename.split('.').pop() || '';
       const previewUrl = isImage
         ? this.getServerImgUrl(attachment.name)
         : this.getFilePreviewUrl(attachment.name);
       return {
         filename: filename,
         extension: extension.toUpperCase(),
-        isImage: attachment.type === "image",
+        isImage: attachment.type === 'image',
         previewUrl: previewUrl,
         clickHandler: () => {
-          if (attachment.type === "image") {
+          if (attachment.type === 'image') {
             const imageUrl = this.getServerImgUrl(attachment.name);
             imageViewerStore.open(imageUrl, { name: attachment.name });
           } else {
@@ -386,15 +379,15 @@ const model = {
   async downloadAttachment(filename) {
     try {
       const path = this.getServerFileUrl(filename);
-      const response = await fetchApi("/download_work_dir_file?path=" + path);
+      const response = await fetchApi('/download_work_dir_file?path=' + path);
 
       if (!response.ok) {
-        throw new Error("Network response was not ok");
+        throw new Error('Network response was not ok');
       }
 
       const blob = await response.blob();
 
-      const link = document.createElement("a");
+      const link = document.createElement('a');
       link.href = window.URL.createObjectURL(blob);
       link.download = filename;
       document.body.appendChild(link);
@@ -402,25 +395,21 @@ const model = {
       document.body.removeChild(link);
       window.URL.revokeObjectURL(link.href);
     } catch (error) {
-      window.toastFetchError("Error downloading file", error);
-      alert("Error downloading file");
+      window.toastFetchError('Error downloading file', error);
+      alert('Error downloading file');
     }
   },
 
   // Generate GUID for unique filenames
   generateGUID() {
-    return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(
-      /[xy]/g,
-      function (c) {
-        const r = (Math.random() * 16) | 0;
-        const v = c == "x" ? r : (r & 0x3) | 0x8;
-        return v.toString(16);
-      }
-    );
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+      const r = (Math.random() * 16) | 0;
+      const v = c == 'x' ? r : (r & 0x3) | 0x8;
+      return v.toString(16);
+    });
   },
-
 };
 
-const store = createStore("chatAttachments", model);
+const store = createStore('chatAttachments', model);
 
 export { store };

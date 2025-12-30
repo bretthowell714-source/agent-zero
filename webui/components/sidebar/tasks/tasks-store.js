@@ -1,10 +1,10 @@
-import { createStore } from "/js/AlpineStore.js";
-import { store as chatsStore } from "/components/sidebar/chats/chats-store.js";
+import { createStore } from '/js/AlpineStore.js';
+import { store as chatsStore } from '/components/sidebar/chats/chats-store.js';
 
 // Tasks sidebar store: tasks list and selected task id
 const model = {
   tasks: [],
-  selected: "",
+  selected: '',
 
   init() {
     // No-op: data is driven by poll() in index.js; this store provides a stable target
@@ -19,18 +19,22 @@ const model = {
 
       // After updating tasks, ensure selection is still valid
       if (this.selected && !this.contains(this.selected)) {
-        this.setSelected("");
+        this.setSelected('');
       }
-    } catch (e) {
-      console.error("tasks-store.applyTasks failed", e);
+    } catch (_e) {
+      console.error('tasks-store.applyTasks failed', _e);
       this.tasks = [];
     }
   },
 
   // Update selected task and persist for tab restore
   setSelected(taskId) {
-    this.selected = taskId || "";
-    try { localStorage.setItem("lastSelectedTask", this.selected); } catch {}
+    this.selected = taskId || '';
+    try {
+      localStorage.setItem('lastSelectedTask', this.selected);
+    } catch (_e) {
+      /* Ignore localStorage errors */
+    }
   },
 
   // Returns true if a task with the given id exists in the current list
@@ -40,7 +44,7 @@ const model = {
 
   // Convenience: id of the first task in the current list (or empty string)
   firstId() {
-    return (Array.isArray(this.tasks) && this.tasks[0]?.id) || "";
+    return (Array.isArray(this.tasks) && this.tasks[0]?.id) || '';
   },
 
   // Action methods for task management
@@ -66,6 +70,4 @@ const model = {
   },
 };
 
-export const store = createStore("tasks", model);
-
-
+export const store = createStore('tasks', model);

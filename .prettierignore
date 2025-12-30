@@ -1,0 +1,12 @@
+node_modules
+dist
+.venv
+docker
+*.min.js
+*.min.css
+webui/vendor
+.git
+__pycache__
+*.pyc
+logs
+tmp

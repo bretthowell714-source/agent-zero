@@ -1,11 +1,11 @@
 // message actions and components
-import { store as imageViewerStore } from "../components/modals/image-viewer/image-viewer-store.js";
-import { marked } from "../vendor/marked/marked.esm.js";
-import { store as _messageResizeStore } from "/components/messages/resize/message-resize-store.js"; // keep here, required in html
-import { store as attachmentsStore } from "/components/chat/attachments/attachmentsStore.js";
-import { addActionButtonsToElement } from "/components/messages/action-buttons/simple-action-buttons.js";
+import { store as imageViewerStore } from '../components/modals/image-viewer/image-viewer-store.js';
+import { marked } from '../vendor/marked/marked.esm.js';
+import { store as _messageResizeStore } from '/components/messages/resize/message-resize-store.js'; // keep here, required in html
+import { store as attachmentsStore } from '/components/chat/attachments/attachmentsStore.js';
+import { addActionButtonsToElement } from '/components/messages/action-buttons/simple-action-buttons.js';
 
-const chatHistory = document.getElementById("chat-history");
+const chatHistory = document.getElementById('chat-history');
 
 let messageGroup = null;
 
@@ -22,10 +22,10 @@ export function setMessage(id, type, heading, content, temp, kvps = null) {
   } else {
     // Create a new container if not found
     isNewMessage = true;
-    const sender = type === "user" ? "user" : "ai";
-    messageContainer = document.createElement("div");
+    const sender = type === 'user' ? 'user' : 'ai';
+    messageContainer = document.createElement('div');
     messageContainer.id = `message-${id}`;
-    messageContainer.classList.add("message-container", `${sender}-container`);
+    messageContainer.classList.add('message-container', `${sender}-container`);
   }
 
   const handler = getHandler(type);
@@ -35,13 +35,13 @@ export function setMessage(id, type, heading, content, temp, kvps = null) {
   if (!document.getElementById(`message-${id}`)) {
     // message type visual grouping
     const groupTypeMap = {
-      user: "right",
-      info: "mid",
-      warning: "mid",
-      error: "mid",
-      rate_limit: "mid",
-      util: "mid",
-      hint: "mid",
+      user: 'right',
+      info: 'mid',
+      warning: 'mid',
+      error: 'mid',
+      rate_limit: 'mid',
+      util: 'mid',
+      hint: 'mid',
       // anything else is "left"
     };
     //force new group on these types
@@ -50,21 +50,20 @@ export function setMessage(id, type, heading, content, temp, kvps = null) {
       // anything else is false
     };
 
-    const groupType = groupTypeMap[type] || "left";
+    const groupType = groupTypeMap[type] || 'left';
 
     // here check if messageGroup is still in DOM, if not, then set it to null (context switch)
-    if (messageGroup && !document.getElementById(messageGroup.id))
-      messageGroup = null;
+    if (messageGroup && !document.getElementById(messageGroup.id)) messageGroup = null;
 
     if (
       !messageGroup || // no group yet exists
       groupStart[type] || // message type forces new group
-      groupType != messageGroup.getAttribute("data-group-type") // message type changes group
+      groupType != messageGroup.getAttribute('data-group-type') // message type changes group
     ) {
-      messageGroup = document.createElement("div");
+      messageGroup = document.createElement('div');
       messageGroup.id = `message-group-${id}`;
       messageGroup.classList.add(`message-group`, `message-group-${groupType}`);
-      messageGroup.setAttribute("data-group-type", groupType);
+      messageGroup.setAttribute('data-group-type', groupType);
     }
     messageGroup.appendChild(messageContainer);
     chatHistory.appendChild(messageGroup);
@@ -79,29 +78,29 @@ export function setMessage(id, type, heading, content, temp, kvps = null) {
 
 export function getHandler(type) {
   switch (type) {
-    case "user":
+    case 'user':
       return drawMessageUser;
-    case "agent":
+    case 'agent':
       return drawMessageAgent;
-    case "response":
+    case 'response':
       return drawMessageResponse;
-    case "tool":
+    case 'tool':
       return drawMessageTool;
-    case "code_exe":
+    case 'code_exe':
       return drawMessageCodeExe;
-    case "browser":
+    case 'browser':
       return drawMessageBrowser;
-    case "warning":
+    case 'warning':
       return drawMessageWarning;
-    case "rate_limit":
+    case 'rate_limit':
       return drawMessageWarning;
-    case "error":
+    case 'error':
       return drawMessageError;
-    case "info":
+    case 'info':
       return drawMessageInfo;
-    case "util":
+    case 'util':
       return drawMessageUtil;
-    case "hint":
+    case 'hint':
       return drawMessageInfo;
     default:
       return drawMessageDefault;
@@ -115,7 +114,7 @@ export function _drawMessage(
   content,
   temp,
   followUp,
-  mainClass = "",
+  mainClass = '',
   kvps = null,
   messageClasses = [],
   contentClasses = [],
@@ -124,37 +123,37 @@ export function _drawMessage(
   resizeBtns = true
 ) {
   // Find existing message div or create new one
-  let messageDiv = messageContainer.querySelector(".message");
+  let messageDiv = messageContainer.querySelector('.message');
   if (!messageDiv) {
-    messageDiv = document.createElement("div");
-    messageDiv.classList.add("message");
+    messageDiv = document.createElement('div');
+    messageDiv.classList.add('message');
     messageContainer.appendChild(messageDiv);
   }
 
   // Update message classes
-  messageDiv.className = `message ${mainClass} ${messageClasses.join(" ")}`;
+  messageDiv.className = `message ${mainClass} ${messageClasses.join(' ')}`;
 
   // Handle heading
   if (heading) {
-    let headingElement = messageDiv.querySelector(".msg-heading");
+    let headingElement = messageDiv.querySelector('.msg-heading');
     if (!headingElement) {
-      headingElement = document.createElement("div");
-      headingElement.classList.add("msg-heading");
+      headingElement = document.createElement('div');
+      headingElement.classList.add('msg-heading');
       messageDiv.insertBefore(headingElement, messageDiv.firstChild);
     }
 
-    let headingH4 = headingElement.querySelector("h4");
+    let headingH4 = headingElement.querySelector('h4');
     if (!headingH4) {
-      headingH4 = document.createElement("h4");
+      headingH4 = document.createElement('h4');
       headingElement.appendChild(headingH4);
     }
     headingH4.innerHTML = convertIcons(escapeHTML(heading));
 
     if (resizeBtns) {
-      let minMaxBtn = headingElement.querySelector(".msg-min-max-btns");
+      let minMaxBtn = headingElement.querySelector('.msg-min-max-btns');
       if (!minMaxBtn) {
-        minMaxBtn = document.createElement("div");
-        minMaxBtn.classList.add("msg-min-max-btns");
+        minMaxBtn = document.createElement('div');
+        minMaxBtn.classList.add('msg-min-max-btns');
         minMaxBtn.innerHTML = `
           <a href="#" class="msg-min-max-btn" @click.prevent="$store.messageResize.minimizeMessageClass('${mainClass}', $event)"><span class="material-symbols-outlined" x-text="$store.messageResize.getSetting('${mainClass}').minimized ? 'expand_content' : 'minimize'"></span></a>
           <a href="#" class="msg-min-max-btn" x-show="!$store.messageResize.getSetting('${mainClass}').minimized" @click.prevent="$store.messageResize.maximizeMessageClass('${mainClass}', $event)"><span class="material-symbols-outlined" x-text="$store.messageResize.getSetting('${mainClass}').maximized ? 'expand' : 'expand_all'"></span></a>
@@ -164,17 +163,17 @@ export function _drawMessage(
     }
   } else {
     // Remove heading if it exists but heading is null
-    const existingHeading = messageDiv.querySelector(".msg-heading");
+    const existingHeading = messageDiv.querySelector('.msg-heading');
     if (existingHeading) {
       existingHeading.remove();
     }
   }
 
   // Find existing body div or create new one
-  let bodyDiv = messageDiv.querySelector(".message-body");
+  let bodyDiv = messageDiv.querySelector('.message-body');
   if (!bodyDiv) {
-    bodyDiv = document.createElement("div");
-    bodyDiv.classList.add("message-body");
+    bodyDiv = document.createElement('div');
+    bodyDiv.classList.add('message-body');
     messageDiv.appendChild(bodyDiv);
   }
 
@@ -187,16 +186,16 @@ export function _drawMessage(
   // Handle content
   if (content && content.trim().length > 0) {
     if (markdown) {
-      let contentDiv = bodyDiv.querySelector(".msg-content");
+      let contentDiv = bodyDiv.querySelector('.msg-content');
       if (!contentDiv) {
-        contentDiv = document.createElement("div");
+        contentDiv = document.createElement('div');
         bodyDiv.appendChild(contentDiv);
       }
-      contentDiv.className = `msg-content ${contentClasses.join(" ")}`;
+      contentDiv.className = `msg-content ${contentClasses.join(' ')}`;
 
-      let spanElement = contentDiv.querySelector("span");
+      let spanElement = contentDiv.querySelector('span');
       if (!spanElement) {
-        spanElement = document.createElement("span");
+        spanElement = document.createElement('span');
         contentDiv.appendChild(spanElement);
       }
 
@@ -211,7 +210,7 @@ export function _drawMessage(
 
       // KaTeX rendering for markdown
       if (latex) {
-        spanElement.querySelectorAll("latex").forEach((element) => {
+        spanElement.querySelectorAll('latex').forEach((element) => {
           katex.render(element.innerHTML, element, {
             throwOnError: false,
           });
@@ -221,23 +220,22 @@ export function _drawMessage(
       // Ensure action buttons exist
       addActionButtonsToElement(bodyDiv);
       adjustMarkdownRender(contentDiv);
-
     } else {
-      let preElement = bodyDiv.querySelector(".msg-content");
+      let preElement = bodyDiv.querySelector('.msg-content');
       if (!preElement) {
-        preElement = document.createElement("pre");
-        preElement.classList.add("msg-content", ...contentClasses);
-        preElement.style.whiteSpace = "pre-wrap";
-        preElement.style.wordBreak = "break-word";
+        preElement = document.createElement('pre');
+        preElement.classList.add('msg-content', ...contentClasses);
+        preElement.style.whiteSpace = 'pre-wrap';
+        preElement.style.wordBreak = 'break-word';
         bodyDiv.appendChild(preElement);
       } else {
         // Update classes
-        preElement.className = `msg-content ${contentClasses.join(" ")}`;
+        preElement.className = `msg-content ${contentClasses.join(' ')}`;
       }
 
-      let spanElement = preElement.querySelector("span");
+      let spanElement = preElement.querySelector('span');
       if (!spanElement) {
-        spanElement = document.createElement("span");
+        spanElement = document.createElement('span');
         preElement.appendChild(spanElement);
       }
 
@@ -245,11 +243,10 @@ export function _drawMessage(
 
       // Ensure action buttons exist
       addActionButtonsToElement(bodyDiv);
-
     }
   } else {
     // Remove content if it exists but content is empty
-    const existingContent = bodyDiv.querySelector(".msg-content");
+    const existingContent = bodyDiv.querySelector('.msg-content');
     if (existingContent) {
       existingContent.remove();
     }
@@ -259,33 +256,26 @@ export function _drawMessage(
   scroller.reApplyScroll();
 
   if (followUp) {
-    messageContainer.classList.add("message-followup");
+    messageContainer.classList.add('message-followup');
   }
 
   return messageDiv;
 }
 
 export function addBlankTargetsToLinks(str) {
-  const doc = new DOMParser().parseFromString(str, "text/html");
+  const doc = new DOMParser().parseFromString(str, 'text/html');
 
-  doc.querySelectorAll("a").forEach((anchor) => {
-    const href = anchor.getAttribute("href") || "";
-    if (
-      href.startsWith("#") ||
-      href.trim().toLowerCase().startsWith("javascript")
-    )
-      return;
-    if (
-      !anchor.hasAttribute("target") ||
-      anchor.getAttribute("target") === ""
-    ) {
-      anchor.setAttribute("target", "_blank");
+  doc.querySelectorAll('a').forEach((anchor) => {
+    const href = anchor.getAttribute('href') || '';
+    if (href.startsWith('#') || href.trim().toLowerCase().startsWith('javascript')) return;
+    if (!anchor.hasAttribute('target') || anchor.getAttribute('target') === '') {
+      anchor.setAttribute('target', '_blank');
     }
 
-    const rel = (anchor.getAttribute("rel") || "").split(/\s+/).filter(Boolean);
-    if (!rel.includes("noopener")) rel.push("noopener");
-    if (!rel.includes("noreferrer")) rel.push("noreferrer");
-    anchor.setAttribute("rel", rel.join(" "));
+    const rel = (anchor.getAttribute('rel') || '').split(/\s+/).filter(Boolean);
+    if (!rel.includes('noopener')) rel.push('noopener');
+    if (!rel.includes('noreferrer')) rel.push('noreferrer');
+    anchor.setAttribute('rel', rel.join(' '));
   });
   return doc.body.innerHTML;
 }
@@ -305,28 +295,20 @@ export function drawMessageDefault(
     content,
     temp,
     false,
-    "message-default",
+    'message-default',
     kvps,
-    ["message-ai"],
-    ["msg-json"],
+    ['message-ai'],
+    ['msg-json'],
     false,
     false
   );
 }
 
-export function drawMessageAgent(
-  messageContainer,
-  id,
-  type,
-  heading,
-  content,
-  temp,
-  kvps = null
-) {
+export function drawMessageAgent(messageContainer, id, type, heading, content, temp, kvps = null) {
   let kvpsFlat = null;
   if (kvps) {
-    kvpsFlat = { ...kvps, ...(kvps["tool_args"] || {}) };
-    delete kvpsFlat["tool_args"];
+    kvpsFlat = { ...kvps, ...(kvps['tool_args'] || {}) };
+    delete kvpsFlat['tool_args'];
   }
 
   _drawMessage(
@@ -335,10 +317,10 @@ export function drawMessageAgent(
     content,
     temp,
     false,
-    "message-agent",
+    'message-agent',
     kvpsFlat,
-    ["message-ai"],
-    ["msg-json"],
+    ['message-ai'],
+    ['msg-json'],
     false,
     false
   );
@@ -359,9 +341,9 @@ export function drawMessageResponse(
     content,
     temp,
     true,
-    "message-agent-response",
+    'message-agent-response',
     null,
-    ["message-ai"],
+    ['message-ai'],
     [],
     true,
     true
@@ -383,9 +365,9 @@ export function drawMessageDelegation(
     content,
     temp,
     true,
-    "message-agent-delegation",
+    'message-agent-delegation',
     kvps,
-    ["message-ai", "message-agent"],
+    ['message-ai', 'message-agent'],
     [],
     true,
     false
@@ -403,36 +385,36 @@ export function drawMessageUser(
   latex = false
 ) {
   // Find existing message div or create new one
-  let messageDiv = messageContainer.querySelector(".message");
+  let messageDiv = messageContainer.querySelector('.message');
   if (!messageDiv) {
-    messageDiv = document.createElement("div");
-    messageDiv.classList.add("message", "message-user");
+    messageDiv = document.createElement('div');
+    messageDiv.classList.add('message', 'message-user');
     messageContainer.appendChild(messageDiv);
   } else {
     // Ensure it has the correct classes if it already exists
-    messageDiv.className = "message message-user";
+    messageDiv.className = 'message message-user';
   }
 
   // Handle heading
-  let headingElement = messageDiv.querySelector(".msg-heading");
+  let headingElement = messageDiv.querySelector('.msg-heading');
   if (!headingElement) {
-    headingElement = document.createElement("h4");
-    headingElement.classList.add("msg-heading");
+    headingElement = document.createElement('h4');
+    headingElement.classList.add('msg-heading');
     messageDiv.insertBefore(headingElement, messageDiv.firstChild);
   }
   headingElement.innerHTML = `${heading} <span class='icon material-symbols-outlined'>person</span>`;
 
   // Handle content
-  let textDiv = messageDiv.querySelector(".message-text");
+  let textDiv = messageDiv.querySelector('.message-text');
   if (content && content.trim().length > 0) {
     if (!textDiv) {
-      textDiv = document.createElement("div");
-      textDiv.classList.add("message-text");
+      textDiv = document.createElement('div');
+      textDiv.classList.add('message-text');
       messageDiv.appendChild(textDiv);
     }
-    let spanElement = textDiv.querySelector("pre");
+    let spanElement = textDiv.querySelector('pre');
     if (!spanElement) {
-      spanElement = document.createElement("pre");
+      spanElement = document.createElement('pre');
       textDiv.appendChild(spanElement);
     }
     spanElement.innerHTML = escapeHTML(content);
@@ -442,57 +424,54 @@ export function drawMessageUser(
   }
 
   // Handle attachments
-  let attachmentsContainer = messageDiv.querySelector(".attachments-container");
+  let attachmentsContainer = messageDiv.querySelector('.attachments-container');
   if (kvps && kvps.attachments && kvps.attachments.length > 0) {
     if (!attachmentsContainer) {
-      attachmentsContainer = document.createElement("div");
-      attachmentsContainer.classList.add("attachments-container");
+      attachmentsContainer = document.createElement('div');
+      attachmentsContainer.classList.add('attachments-container');
       messageDiv.appendChild(attachmentsContainer);
     }
     // Important: Clear existing attachments to re-render, preventing duplicates on update
-    attachmentsContainer.innerHTML = ""; 
+    attachmentsContainer.innerHTML = '';
 
     kvps.attachments.forEach((attachment) => {
-      const attachmentDiv = document.createElement("div");
-      attachmentDiv.classList.add("attachment-item");
+      const attachmentDiv = document.createElement('div');
+      attachmentDiv.classList.add('attachment-item');
 
       const displayInfo = attachmentsStore.getAttachmentDisplayInfo(attachment);
 
       if (displayInfo.isImage) {
-        attachmentDiv.classList.add("image-type");
+        attachmentDiv.classList.add('image-type');
 
-        const img = document.createElement("img");
+        const img = document.createElement('img');
         img.src = displayInfo.previewUrl;
         img.alt = displayInfo.filename;
-        img.classList.add("attachment-preview");
-        img.style.cursor = "pointer";
+        img.classList.add('attachment-preview');
+        img.style.cursor = 'pointer';
 
         attachmentDiv.appendChild(img);
       } else {
         // Render as file tile with title and icon
-        attachmentDiv.classList.add("file-type");
+        attachmentDiv.classList.add('file-type');
 
         // File icon
-        if (
-          displayInfo.previewUrl &&
-          displayInfo.previewUrl !== displayInfo.filename
-        ) {
-          const iconImg = document.createElement("img");
+        if (displayInfo.previewUrl && displayInfo.previewUrl !== displayInfo.filename) {
+          const iconImg = document.createElement('img');
           iconImg.src = displayInfo.previewUrl;
           iconImg.alt = `${displayInfo.extension} file`;
-          iconImg.classList.add("file-icon");
+          iconImg.classList.add('file-icon');
           attachmentDiv.appendChild(iconImg);
         }
 
         // File title
-        const fileTitle = document.createElement("div");
-        fileTitle.classList.add("file-title");
+        const fileTitle = document.createElement('div');
+        fileTitle.classList.add('file-title');
         fileTitle.textContent = displayInfo.filename;
 
         attachmentDiv.appendChild(fileTitle);
       }
 
-      attachmentDiv.addEventListener("click", displayInfo.clickHandler);
+      attachmentDiv.addEventListener('click', displayInfo.clickHandler);
 
       attachmentsContainer.appendChild(attachmentDiv);
     });
@@ -502,25 +481,17 @@ export function drawMessageUser(
   // The messageDiv is already appended or updated, no need to append again
 }
 
-export function drawMessageTool(
-  messageContainer,
-  id,
-  type,
-  heading,
-  content,
-  temp,
-  kvps = null
-) {
+export function drawMessageTool(messageContainer, id, type, heading, content, temp, kvps = null) {
   _drawMessage(
     messageContainer,
     heading,
     content,
     temp,
     true,
-    "message-tool",
+    'message-tool',
     kvps,
-    ["message-ai"],
-    ["msg-output"],
+    ['message-ai'],
+    ['msg-output'],
     false,
     false
   );
@@ -541,9 +512,9 @@ export function drawMessageCodeExe(
     content,
     temp,
     true,
-    "message-code-exe",
+    'message-code-exe',
     null,
-    ["message-ai"],
+    ['message-ai'],
     [],
     false,
     false
@@ -565,10 +536,10 @@ export function drawMessageBrowser(
     content,
     temp,
     true,
-    "message-browser",
+    'message-browser',
     kvps,
-    ["message-ai"],
-    ["msg-json"],
+    ['message-ai'],
+    ['msg-json'],
     false,
     false
   );
@@ -597,20 +568,12 @@ export function drawMessageAgentPlain(
     false,
     false
   );
-  messageContainer.classList.add("center-container");
+  messageContainer.classList.add('center-container');
 }
 
-export function drawMessageInfo(
-  messageContainer,
-  id,
-  type,
-  heading,
-  content,
-  temp,
-  kvps = null
-) {
+export function drawMessageInfo(messageContainer, id, type, heading, content, temp, kvps = null) {
   return drawMessageAgentPlain(
-    "message-info",
+    'message-info',
     messageContainer,
     id,
     type,
@@ -621,29 +584,21 @@ export function drawMessageInfo(
   );
 }
 
-export function drawMessageUtil(
-  messageContainer,
-  id,
-  type,
-  heading,
-  content,
-  temp,
-  kvps = null
-) {
+export function drawMessageUtil(messageContainer, id, type, heading, content, temp, kvps = null) {
   _drawMessage(
     messageContainer,
     heading,
     content,
     temp,
     false,
-    "message-util",
+    'message-util',
     kvps,
     [],
-    ["msg-json"],
+    ['msg-json'],
     false,
     false
   );
-  messageContainer.classList.add("center-container");
+  messageContainer.classList.add('center-container');
 }
 
 export function drawMessageWarning(
@@ -656,7 +611,7 @@ export function drawMessageWarning(
   kvps = null
 ) {
   return drawMessageAgentPlain(
-    "message-warning",
+    'message-warning',
     messageContainer,
     id,
     type,
@@ -667,17 +622,9 @@ export function drawMessageWarning(
   );
 }
 
-export function drawMessageError(
-  messageContainer,
-  id,
-  type,
-  heading,
-  content,
-  temp,
-  kvps = null
-) {
+export function drawMessageError(messageContainer, id, type, heading, content, temp, kvps = null) {
   return drawMessageAgentPlain(
-    "message-error",
+    'message-error',
     messageContainer,
     id,
     type,
@@ -690,22 +637,22 @@ export function drawMessageError(
 
 function drawKvps(container, kvps, latex) {
   if (kvps) {
-    const table = document.createElement("table");
-    table.classList.add("msg-kvps");
+    const table = document.createElement('table');
+    table.classList.add('msg-kvps');
     for (let [key, value] of Object.entries(kvps)) {
       const row = table.insertRow();
-      row.classList.add("kvps-row");
-      if (key === "thoughts" || key === "reasoning")
+      row.classList.add('kvps-row');
+      if (key === 'thoughts' || key === 'reasoning')
         // TODO: find a better way to determine special class assignment
-        row.classList.add("msg-thoughts");
+        row.classList.add('msg-thoughts');
 
       const th = row.insertCell();
       th.textContent = convertToTitleCase(key);
-      th.classList.add("kvps-key");
+      th.classList.add('kvps-key');
 
       const td = row.insertCell();
-      const tdiv = document.createElement("div");
-      tdiv.classList.add("kvps-val");
+      const tdiv = document.createElement('div');
+      tdiv.classList.add('kvps-val');
       td.appendChild(tdiv);
 
       if (Array.isArray(value)) {
@@ -725,30 +672,30 @@ function drawKvps(container, kvps, latex) {
       }, 0);
 
       function addValue(value) {
-        if (typeof value === "object") value = JSON.stringify(value, null, 2);
+        if (typeof value === 'object') value = JSON.stringify(value, null, 2);
 
-        if (typeof value === "string" && value.startsWith("img://")) {
-          const imgElement = document.createElement("img");
-          imgElement.classList.add("kvps-img");
-          imgElement.src = value.replace("img://", "/image_get?path=");
-          imgElement.alt = "Image Attachment";
+        if (typeof value === 'string' && value.startsWith('img://')) {
+          const imgElement = document.createElement('img');
+          imgElement.classList.add('kvps-img');
+          imgElement.src = value.replace('img://', '/image_get?path=');
+          imgElement.alt = 'Image Attachment';
           tdiv.appendChild(imgElement);
 
           // Add click handler and cursor change
-          imgElement.style.cursor = "pointer";
-          imgElement.addEventListener("click", () => {
+          imgElement.style.cursor = 'pointer';
+          imgElement.addEventListener('click', () => {
             openImageModal(imgElement.src, 1000);
           });
         } else {
-          const pre = document.createElement("pre");
-          const span = document.createElement("span");
+          const pre = document.createElement('pre');
+          const span = document.createElement('span');
           span.innerHTML = convertHTML(value);
           pre.appendChild(span);
           tdiv.appendChild(pre);
 
           // KaTeX rendering for markdown
           if (latex) {
-            span.querySelectorAll("latex").forEach((element) => {
+            span.querySelectorAll('latex').forEach((element) => {
               katex.render(element.innerHTML, element, {
                 throwOnError: false,
               });
@@ -764,15 +711,15 @@ function drawKvps(container, kvps, latex) {
 function drawKvpsIncremental(container, kvps, latex) {
   if (kvps) {
     // Find existing table or create new one
-    let table = container.querySelector(".msg-kvps");
+    let table = container.querySelector('.msg-kvps');
     if (!table) {
-      table = document.createElement("table");
-      table.classList.add("msg-kvps");
+      table = document.createElement('table');
+      table.classList.add('msg-kvps');
       container.appendChild(table);
     }
 
     // Get all current rows for comparison
-    let existingRows = table.querySelectorAll(".kvps-row");
+    let existingRows = table.querySelectorAll('.kvps-row');
     const kvpEntries = Object.entries(kvps);
 
     // Update or create rows as needed
@@ -782,20 +729,20 @@ function drawKvpsIncremental(container, kvps, latex) {
       if (!row) {
         // Create new row if it doesn't exist
         row = table.insertRow();
-        row.classList.add("kvps-row");
+        row.classList.add('kvps-row');
       }
 
       // Update row classes
-      row.className = "kvps-row";
-      if (key === "thoughts" || key === "reasoning") {
-        row.classList.add("msg-thoughts");
+      row.className = 'kvps-row';
+      if (key === 'thoughts' || key === 'reasoning') {
+        row.classList.add('msg-thoughts');
       }
 
       // Handle key cell
-      let th = row.querySelector(".kvps-key");
+      let th = row.querySelector('.kvps-key');
       if (!th) {
         th = row.insertCell(0);
-        th.classList.add("kvps-key");
+        th.classList.add('kvps-key');
       }
       th.textContent = convertToTitleCase(key);
 
@@ -805,10 +752,10 @@ function drawKvpsIncremental(container, kvps, latex) {
         td = row.insertCell(1);
       }
 
-      let tdiv = td.querySelector(".kvps-val");
+      let tdiv = td.querySelector('.kvps-val');
       if (!tdiv) {
-        tdiv = document.createElement("div");
-        tdiv.classList.add("kvps-val");
+        tdiv = document.createElement('div');
+        tdiv.classList.add('kvps-val');
         td.appendChild(tdiv);
       }
 
@@ -816,7 +763,7 @@ function drawKvpsIncremental(container, kvps, latex) {
       const scroller = new Scroller(tdiv);
 
       // Clear and rebuild content (for now - could be optimized further)
-      tdiv.innerHTML = "";
+      tdiv.innerHTML = '';
 
       addActionButtonsToElement(tdiv);
 
@@ -836,27 +783,27 @@ function drawKvpsIncremental(container, kvps, latex) {
     while (existingRows.length > kvpEntries.length) {
       const lastRow = existingRows[existingRows.length - 1];
       lastRow.remove();
-      existingRows = table.querySelectorAll(".kvps-row");
+      existingRows = table.querySelectorAll('.kvps-row');
     }
 
     function addValue(value, tdiv) {
-      if (typeof value === "object") value = JSON.stringify(value, null, 2);
+      if (typeof value === 'object') value = JSON.stringify(value, null, 2);
 
-      if (typeof value === "string" && value.startsWith("img://")) {
-        const imgElement = document.createElement("img");
-        imgElement.classList.add("kvps-img");
-        imgElement.src = value.replace("img://", "/image_get?path=");
-        imgElement.alt = "Image Attachment";
+      if (typeof value === 'string' && value.startsWith('img://')) {
+        const imgElement = document.createElement('img');
+        imgElement.classList.add('kvps-img');
+        imgElement.src = value.replace('img://', '/image_get?path=');
+        imgElement.alt = 'Image Attachment';
         tdiv.appendChild(imgElement);
 
         // Add click handler and cursor change
-        imgElement.style.cursor = "pointer";
-        imgElement.addEventListener("click", () => {
+        imgElement.style.cursor = 'pointer';
+        imgElement.addEventListener('click', () => {
           imageViewerStore.open(imgElement.src, { refreshInterval: 1000 });
         });
       } else {
-        const pre = document.createElement("pre");
-        const span = document.createElement("span");
+        const pre = document.createElement('pre');
+        const span = document.createElement('span');
         span.innerHTML = convertHTML(value);
         pre.appendChild(span);
         tdiv.appendChild(pre);
@@ -864,12 +811,12 @@ function drawKvpsIncremental(container, kvps, latex) {
         // Add action buttons to the row
         // const row = tdiv.closest(".kvps-row");
         // if (row) {
-          // addActionButtonsToElement(pre);
+        // addActionButtonsToElement(pre);
         // }
 
         // KaTeX rendering for markdown
         if (latex) {
-          span.querySelectorAll("latex").forEach((element) => {
+          span.querySelectorAll('latex').forEach((element) => {
             katex.render(element.innerHTML, element, {
               throwOnError: false,
             });
@@ -879,7 +826,7 @@ function drawKvpsIncremental(container, kvps, latex) {
     }
   } else {
     // Remove table if kvps is null/empty
-    const existingTable = container.querySelector(".msg-kvps");
+    const existingTable = container.querySelector('.msg-kvps');
     if (existingTable) {
       existingTable.remove();
     }
@@ -888,7 +835,7 @@ function drawKvpsIncremental(container, kvps, latex) {
 
 function convertToTitleCase(str) {
   return str
-    .replace(/_/g, " ") // Replace underscores with spaces
+    .replace(/_/g, ' ') // Replace underscores with spaces
     .toLowerCase() // Convert the entire string to lowercase
     .replace(/\b\w/g, function (match) {
       return match.toUpperCase(); // Capitalize the first letter of each word
@@ -900,18 +847,15 @@ function convertImageTags(content) {
   const imageTagRegex = /<image>(.*?)<\/image>/g;
 
   // Replace <image> tags with <img> tags with base64 source
-  const updatedContent = content.replace(
-    imageTagRegex,
-    (match, base64Content) => {
-      return `<img src="data:image/jpeg;base64,${base64Content}" alt="Image Attachment" style="max-width: 250px !important;"/>`;
-    }
-  );
+  const updatedContent = content.replace(imageTagRegex, (match, base64Content) => {
+    return `<img src="data:image/jpeg;base64,${base64Content}" alt="Image Attachment" style="max-width: 250px !important;"/>`;
+  });
 
   return updatedContent;
 }
 
 function convertHTML(str) {
-  if (typeof str !== "string") str = JSON.stringify(str, null, 2);
+  if (typeof str !== 'string') str = JSON.stringify(str, null, 2);
 
   let result = escapeHTML(str);
   result = convertImageTags(result);
@@ -920,7 +864,7 @@ function convertHTML(str) {
 }
 
 function convertImgFilePaths(str) {
-  return str.replace(/img:\/\//g, "/image_get?path=");
+  return str.replace(/img:\/\//g, '/image_get?path=');
 }
 
 export function convertIcons(str) {
@@ -932,23 +876,23 @@ export function convertIcons(str) {
 
 function escapeHTML(str) {
   const escapeChars = {
-    "&": "&amp;",
-    "<": "&lt;",
-    ">": "&gt;",
-    "'": "&#39;",
-    '"': "&quot;",
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    "'": '&#39;',
+    '"': '&quot;',
   };
   return str.replace(/[&<>'"]/g, (char) => escapeChars[char]);
 }
 
 function convertPathsToLinks(str) {
   function generateLinks(match) {
-    const parts = match.split("/");
+    const parts = match.split('/');
     if (!parts[0]) parts.shift(); // drop empty element left of first "
-    let conc = "";
-    let html = "";
+    let conc = '';
+    let html = '';
     for (const part of parts) {
-      conc += "/" + part;
+      conc += '/' + part;
       html += `/<a href="#" class="path-link" onclick="openFileLink('${conc}');">${part}</a>`;
     }
     return html;
@@ -958,10 +902,7 @@ function convertPathsToLinks(str) {
   const folder = `[a-zA-Z0-9_\\/.\\-]`;
   const file = `[a-zA-Z0-9_\\-\\/]`;
   const suffix = `(?<!\\.)`;
-  const pathRegex = new RegExp(
-    `(?<=${prefix})\\/${folder}*${file}${suffix}`,
-    "g"
-  );
+  const pathRegex = new RegExp(`(?<=${prefix})\\/${folder}*${file}${suffix}`, 'g');
 
   // skip paths inside html tags, like <img src="/path/to/image">
   const tagRegex = /(<(?:[^<>"']+|"[^"]*"|'[^']*')*>)/g;
@@ -970,21 +911,21 @@ function convertPathsToLinks(str) {
     .split(tagRegex) // keep tags & text separate
     .map((chunk) => {
       // if it *starts* with '<', it's a tag -> leave untouched
-      if (chunk.startsWith("<")) return chunk;
+      if (chunk.startsWith('<')) return chunk;
       // otherwise run your link-generation
       return chunk.replace(pathRegex, generateLinks);
     })
-    .join("");
+    .join('');
 }
 
 function adjustMarkdownRender(element) {
   // find all tables in the element
-  const elements = element.querySelectorAll("table");
+  const elements = element.querySelectorAll('table');
 
   // wrap each with a div with class message-markdown-table-wrap
   elements.forEach((el) => {
-    const wrapper = document.createElement("div");
-    wrapper.className = "message-markdown-table-wrap";
+    const wrapper = document.createElement('div');
+    wrapper.className = 'message-markdown-table-wrap';
     el.parentNode.insertBefore(wrapper, el);
     wrapper.appendChild(el);
   });
@@ -999,8 +940,7 @@ class Scroller {
   isAtBottom(tolerance = 10) {
     const scrollHeight = this.element.scrollHeight;
     const clientHeight = this.element.clientHeight;
-    const distanceFromBottom =
-      scrollHeight - this.element.scrollTop - clientHeight;
+    const distanceFromBottom = scrollHeight - this.element.scrollTop - clientHeight;
     return distanceFromBottom <= tolerance;
   }
 

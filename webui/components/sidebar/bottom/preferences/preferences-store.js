@@ -1,6 +1,6 @@
-import { createStore } from "/js/AlpineStore.js";
-import * as css from "/js/css.js";
-import { store as speechStore } from "/components/chat/speech/speech-store.js";
+import { createStore } from '/js/AlpineStore.js';
+import * as css from '/js/css.js';
+import { store as speechStore } from '/components/chat/speech/speech-store.js';
 
 // Preferences store centralizes user preference toggles and side-effects
 const model = {
@@ -64,15 +64,15 @@ const model = {
     try {
       // Load persisted preferences with safe fallbacks
       try {
-        const storedDarkMode = localStorage.getItem("darkMode");
-        this._darkMode = storedDarkMode !== "false";
+        const storedDarkMode = localStorage.getItem('darkMode');
+        this._darkMode = storedDarkMode !== 'false';
       } catch {
         this._darkMode = true; // Default to dark mode if localStorage is unavailable
       }
 
       try {
-        const storedSpeech = localStorage.getItem("speech");
-        this._speech = storedSpeech === "true";
+        const storedSpeech = localStorage.getItem('speech');
+        this._speech = storedSpeech === 'true';
       } catch {
         this._speech = false; // Default to speech off if localStorage is unavailable
       }
@@ -84,8 +84,8 @@ const model = {
       this._applyShowThoughts(this._showThoughts);
       this._applyShowJson(this._showJson);
       this._applyShowUtils(this._showUtils);
-    } catch (e) {
-      console.error("Failed to initialize preferences store", e);
+    } catch (_e) {
+      console.error('Failed to initialize preferences store', e);
     }
   },
 
@@ -95,39 +95,31 @@ const model = {
 
   _applyDarkMode(value) {
     if (value) {
-      document.body.classList.remove("light-mode");
-      document.body.classList.add("dark-mode");
+      document.body.classList.remove('light-mode');
+      document.body.classList.add('dark-mode');
     } else {
-      document.body.classList.remove("dark-mode");
-      document.body.classList.add("light-mode");
+      document.body.classList.remove('dark-mode');
+      document.body.classList.add('light-mode');
     }
-    localStorage.setItem("darkMode", value);
+    localStorage.setItem('darkMode', value);
   },
 
   _applySpeech(value) {
-    localStorage.setItem("speech", value);
+    localStorage.setItem('speech', value);
     if (!value) speechStore.stopAudio();
   },
 
   _applyShowThoughts(value) {
-    css.toggleCssProperty(
-      ".msg-thoughts",
-      "display",
-      value ? undefined : "none"
-    );
+    css.toggleCssProperty('.msg-thoughts', 'display', value ? undefined : 'none');
   },
 
   _applyShowJson(value) {
-    css.toggleCssProperty(".msg-json", "display", value ? "block" : "none");
+    css.toggleCssProperty('.msg-json', 'display', value ? 'block' : 'none');
   },
 
   _applyShowUtils(value) {
-    css.toggleCssProperty(
-      ".message-util",
-      "display",
-      value ? undefined : "none"
-    );
+    css.toggleCssProperty('.message-util', 'display', value ? undefined : 'none');
   },
 };
 
-export const store = createStore("preferences", model);
+export const store = createStore('preferences', model);

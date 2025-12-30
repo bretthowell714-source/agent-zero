@@ -1,15 +1,15 @@
-import { createStore } from "/js/AlpineStore.js";
+import { createStore } from '/js/AlpineStore.js';
 
 // Store model for the Full-Screen Input Modal
 const model = {
   // State
   isOpen: false,
-  inputText: "",
+  inputText: '',
   wordWrap: true,
   undoStack: [],
   redoStack: [],
   maxStackSize: 100,
-  lastSavedState: "",
+  lastSavedState: '',
 
   // Lifecycle
   init() {
@@ -18,7 +18,7 @@ const model = {
 
   // Open modal with current chat input content
   openModal() {
-    const chatInput = document.getElementById("chat-input");
+    const chatInput = document.getElementById('chat-input');
     this.inputText = chatInput ? chatInput.value : this.inputText;
     this.lastSavedState = this.inputText;
     this.isOpen = true;
@@ -27,17 +27,17 @@ const model = {
 
     // Focus the full screen input after rendering
     setTimeout(() => {
-      const fullScreenInput = document.getElementById("full-screen-input");
+      const fullScreenInput = document.getElementById('full-screen-input');
       if (fullScreenInput) fullScreenInput.focus();
     }, 50);
   },
 
   // Close modal and write value back into main chat input
   handleClose() {
-    const chatInput = document.getElementById("chat-input");
+    const chatInput = document.getElementById('chat-input');
     if (chatInput) {
       chatInput.value = this.inputText;
-      chatInput.dispatchEvent(new Event("input")); // trigger auto-resize
+      chatInput.dispatchEvent(new Event('input')); // trigger auto-resize
     }
     this.isOpen = false;
   },
@@ -68,8 +68,8 @@ const model = {
   clearText() {
     if (!this.inputText) return;
     this.updateHistory();
-    this.inputText = "";
-    this.lastSavedState = "";
+    this.inputText = '';
+    this.lastSavedState = '';
   },
 
   toggleWrap() {
@@ -86,6 +86,4 @@ const model = {
   },
 };
 
-export const store = createStore("fullScreenInputModal", model);
-
-
+export const store = createStore('fullScreenInputModal', model);

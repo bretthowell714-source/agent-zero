@@ -1,0 +1,26 @@
+{
+  "name": "agent-zero",
+  "version": "1.0.0",
+  "description": "Dynamic AI agent framework",
+  "type": "module",
+  "scripts": {
+    "lint": "eslint webui/**/*.js",
+    "lint:fix": "eslint webui/**/*.js --fix",
+    "type-check": "tsc --noEmit",
+    "format": "prettier --write \"webui/**/*.{js,css,html,json}\"",
+    "test": "pytest",
+    "dev": "python run_ui.py",
+    "check-all": "npm run lint && npm run type-check"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.2",
+    "eslint": "^9.39.2",
+    "prettier": "^3.7.4",
+    "typescript": "^5.9.3"
+  },
+  "dependencies": {},
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  }
+}

@@ -1,17 +1,63 @@
 {
+    // Python Configuration
     "python.analysis.typeCheckingMode": "standard",
+    "python.analysis.diagnosticMode": "workspace",
+    "python.linting.enabled": true,
+    "python.linting.pylintEnabled": true,
+    "python.linting.pylintArgs": [
+        "--disable=C0111,C0103,R0913,R0914,W0212,W0613,W0703",
+        "--max-line-length=120"
+    ],
+    "python.formatting.provider": "black",
+    "python.testing.pytestEnabled": true,
+    "python.analysis.autoImportCompletions": true,
+    "python.analysis.inlayHints.functionReturnTypes": true,
+
+    // Pyright Configuration
     "windsurfPyright.analysis.diagnosticMode": "workspace",
     "windsurfPyright.analysis.typeCheckingMode": "standard",
-    // Enable JavaScript linting
+
+    // JavaScript/TypeScript Configuration
     "eslint.enable": true,
-    "eslint.validate": ["javascript", "javascriptreact"],
-    // Set import root for JS/TS
-    "javascript.preferences.importModuleSpecifier": "relative",
-    "js/ts.implicitProjectConfig.checkJs": true,
-    "jsconfig.paths": {
-        "*": ["webui/*"]
+    "eslint.validate": [
+        "javascript",
+        "javascriptreact",
+        "typescript",
+        "typescriptreact"
+    ],
+    "eslint.options": {
+        "overrideConfigFile": "eslint.config.js"
     },
-    // Optional: point VSCode to jsconfig.json if you add one
-    "jsconfig.json": "${workspaceFolder}/jsconfig.json",
-    "postman.settings.dotenv-detection-notification-visibility": false
+    "javascript.preferences.importModuleSpecifier": "relative",
+    "typescript.preferences.importModuleSpecifier": "relative",
+    "js/ts.implicitProjectConfig.checkJs": true,
+    "typescript.updateImportsOnFileMove.enabled": "always",
+    "javascript.updateImportsOnFileMove.enabled": "always",
+
+    // Editor Configuration
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+        "source.fixAll.eslint": "explicit"
+    },
+    "editor.rulers": [80, 120],
+
+    // File Associations
+    "files.associations": {
+        "*.md": "markdown",
+        "*.json": "jsonc"
+    },
+    "files.exclude": {
+        "**/__pycache__": true,
+        "**/*.pyc": true,
+        "**/.pytest_cache": true,
+        "**/node_modules": true
+    },
+
+    // Other Settings
+    "postman.settings.dotenv-detection-notification-visibility": false,
+    "claudeCodeChat.permissions.yoloMode": false,
+
+    // Git Configuration
+    "git.autofetch": true,
+    "git.confirmSync": false
 }

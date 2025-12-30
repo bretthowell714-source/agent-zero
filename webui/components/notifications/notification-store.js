@@ -1,13 +1,13 @@
-import { createStore } from "/js/AlpineStore.js";
-import * as API from "/js/api.js";
-import { openModal } from "/js/modals.js";
+import { createStore } from '/js/AlpineStore.js';
+import * as API from '/js/api.js';
+import { openModal } from '/js/modals.js';
 
 export const NotificationType = {
-  INFO: "info",
-  SUCCESS: "success",
-  WARNING: "warning",
-  ERROR: "error",
-  PROGRESS: "progress",
+  INFO: 'info',
+  SUCCESS: 'success',
+  WARNING: 'warning',
+  ERROR: 'error',
+  PROGRESS: 'progress',
 };
 
 export const NotificationPriority = {
@@ -24,7 +24,7 @@ const model = {
   notifications: [],
   loading: false,
   lastNotificationVersion: 0,
-  lastNotificationGuid: "",
+  lastNotificationGuid: '',
   unreadCount: 0,
   unreadPrioCount: 0,
 
@@ -58,7 +58,7 @@ const model = {
       this.lastNotificationVersion = 0;
       this.notifications = [];
       this.toastStack = []; // Clear toast stack on restart
-      this.lastNotificationGuid = pollData.notifications_guid || "";
+      this.lastNotificationGuid = pollData.notifications_guid || '';
     }
 
     // Process new notifications and add to toast stack
@@ -82,7 +82,7 @@ const model = {
 
     // Update version tracking
     this.lastNotificationVersion = pollData.notifications_version || 0;
-    this.lastNotificationGuid = pollData.notifications_guid || "";
+    this.lastNotificationGuid = pollData.notifications_guid || '';
 
     // Update UI state
     this.updateUnreadCount();
@@ -99,12 +99,9 @@ const model = {
   // NEW: Add notification to toast stack
   addToToastStack(notification) {
     // If notification has a group, remove any existing toasts with the same group
-    if (notification.group && notification.group.trim() !== "") {
-      const existingToast = this.toastStack.find(
-        (t) => t.group === notification.group
-      );
-      if (existingToast && existingToast.toastId)
-        this.removeFromToastStack(existingToast.toastId);
+    if (notification.group && notification.group.trim() !== '') {
+      const existingToast = this.toastStack.find((t) => t.group === notification.group);
+      if (existingToast && existingToast.toastId) this.removeFromToastStack(existingToast.toastId);
     }
 
     // Create toast object with auto-dismiss timer
@@ -193,9 +190,7 @@ const model = {
 
   // Add or update a notification
   addOrUpdateNotification(notification) {
-    const existingIndex = this.notifications.findIndex(
-      (n) => n.id === notification.id
-    );
+    const existingIndex = this.notifications.findIndex((n) => n.id === notification.id);
 
     if (existingIndex >= 0) {
       // Update existing notification
@@ -223,20 +218,18 @@ const model = {
 
   // Mark notification as read
   async markAsRead(notificationId) {
-    const notification = this.notifications.find(
-      (n) => n.id === notificationId
-    );
+    const notification = this.notifications.find((n) => n.id === notificationId);
     if (notification && !notification.read) {
       notification.read = true;
       this.updateUnreadCount();
 
       // Sync with backend (non-blocking)
       try {
-        await API.callJsonApi("notifications_mark_read", {
+        await API.callJsonApi('notifications_mark_read', {
           notification_ids: [notificationId],
         });
       } catch (error) {
-        console.error("Failed to sync notification read status:", error);
+        console.error('Failed to sync notification read status:', error);
         // Don't revert the UI change - user experience should not be affected
       }
     }
@@ -258,11 +251,11 @@ const model = {
 
     // Sync with backend (non-blocking)
     try {
-      await API.callJsonApi("notifications_mark_read", {
+      await API.callJsonApi('notifications_mark_read', {
         mark_all: true,
       });
     } catch (error) {
-      console.error("Failed to sync mark all as read:", error);
+      console.error('Failed to sync mark all as read:', error);
     }
   },
 
@@ -276,9 +269,9 @@ const model = {
 
   async clearBackendNotifications() {
     try {
-      await API.callJsonApi("notifications_clear", null);
+      await API.callJsonApi('notifications_clear', null);
     } catch (error) {
-      console.error("Failed to clear notifications:", error);
+      console.error('Failed to clear notifications:', error);
     }
   },
 
@@ -317,9 +310,7 @@ const model = {
   removeOldNotifications() {
     const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
     const initialCount = this.notifications.length;
-    this.notifications = this.notifications.filter(
-      (n) => new Date(n.timestamp) > oneHourAgo
-    );
+    this.notifications = this.notifications.filter((n) => new Date(n.timestamp) > oneHourAgo);
 
     if (this.notifications.length !== initialCount) {
       this.updateUnreadCount();
@@ -335,8 +326,8 @@ const model = {
     const diffHours = diffMs / 3600000;
     const diffDays = diffMs / 86400000;
 
-    if (diffMins < 0.15) return "Just now";
-    else if (diffMins < 1) return "Less than a minute ago";
+    if (diffMins < 0.15) return 'Just now';
+    else if (diffMins < 1) return 'Less than a minute ago';
     else if (diffMins < 60) return `${Math.round(diffMins)}m ago`;
     else if (diffHours < 24) return `${Math.round(diffHours)}h ago`;
     else if (diffDays < 7) return `${Math.round(diffDays)}d ago`;
@@ -347,32 +338,32 @@ const model = {
   // Get CSS class for notification type
   getNotificationClass(type) {
     const classes = {
-      info: "notification-info",
-      success: "notification-success",
-      warning: "notification-warning",
-      error: "notification-error",
-      progress: "notification-progress",
+      info: 'notification-info',
+      success: 'notification-success',
+      warning: 'notification-warning',
+      error: 'notification-error',
+      progress: 'notification-progress',
     };
-    return classes[type] || "notification-info";
+    return classes[type] || 'notification-info';
   },
 
   // Get CSS class for notification item including read state
   getNotificationItemClass(notification) {
     const typeClass = this.getNotificationClass(notification.type);
-    const readClass = notification.read ? "read" : "unread";
+    const readClass = notification.read ? 'read' : 'unread';
     return `notification-item ${typeClass} ${readClass}`;
   },
 
   // Get icon for notification type (Google Material Icons)
   getNotificationIcon(type) {
     const icons = {
-      info: "info",
-      success: "check_circle",
-      warning: "warning",
-      error: "error",
-      progress: "hourglass_empty",
+      info: 'info',
+      success: 'check_circle',
+      warning: 'warning',
+      error: 'error',
+      progress: 'hourglass_empty',
     };
-    const iconName = icons[type] || "info";
+    const iconName = icons[type] || 'info';
     return `<span class="material-symbols-outlined">${iconName}</span>`;
   },
 
@@ -380,14 +371,14 @@ const model = {
   async createNotification(
     type,
     message,
-    title = "",
-    detail = "",
+    title = '',
+    detail = '',
     display_time = 3,
-    group = "",
+    group = '',
     priority = defaultPriority
   ) {
     try {
-      const response = await globalThis.sendJsonData("/notification_create", {
+      const response = await globalThis.sendJsonData('/notification_create', {
         type: type,
         message: message,
         title: title,
@@ -400,11 +391,11 @@ const model = {
       if (response.success) {
         return response.notification_id;
       } else {
-        console.error("Failed to create notification:", response.error);
+        console.error('Failed to create notification:', response.error);
         return null;
       }
     } catch (error) {
-      console.error("Error creating notification:", error);
+      console.error('Error creating notification:', error);
       return null;
     }
   },
@@ -412,10 +403,10 @@ const model = {
   // Convenience methods for different notification types
   async info(
     message,
-    title = "",
-    detail = "",
+    title = '',
+    detail = '',
     display_time = 3,
-    group = "",
+    group = '',
     priority = defaultPriority
   ) {
     return await this.createNotification(
@@ -431,10 +422,10 @@ const model = {
 
   async success(
     message,
-    title = "",
-    detail = "",
+    title = '',
+    detail = '',
     display_time = 3,
-    group = "",
+    group = '',
     priority = defaultPriority
   ) {
     return await this.createNotification(
@@ -450,10 +441,10 @@ const model = {
 
   async warning(
     message,
-    title = "",
-    detail = "",
+    title = '',
+    detail = '',
     display_time = 3,
-    group = "",
+    group = '',
     priority = defaultPriority
   ) {
     return await this.createNotification(
@@ -469,10 +460,10 @@ const model = {
 
   async error(
     message,
-    title = "",
-    detail = "",
+    title = '',
+    detail = '',
     display_time = 3,
-    group = "",
+    group = '',
     priority = defaultPriority
   ) {
     return await this.createNotification(
@@ -488,10 +479,10 @@ const model = {
 
   async progress(
     message,
-    title = "",
-    detail = "",
+    title = '',
+    detail = '',
     display_time = 3,
-    group = "",
+    group = '',
     priority = defaultPriority
   ) {
     return await this.createNotification(
@@ -510,7 +501,7 @@ const model = {
     // Clear toast stack when modal opens
     this.clearToastStack(false);
     // open modal
-    await openModal("notifications/notification-modal.html");
+    await openModal('notifications/notification-modal.html');
     // mark all as read when modal closes
     this.markAllAsRead();
   },
@@ -525,7 +516,7 @@ const model = {
     // Use the global connection status from index.js, but default to true if undefined
     // This handles the case where polling hasn't run yet but backend is actually available
     const pollingStatus =
-      typeof globalThis.getConnectionStatus === "function"
+      typeof globalThis.getConnectionStatus === 'function'
         ? globalThis.getConnectionStatus()
         : undefined;
 
@@ -543,9 +534,9 @@ const model = {
   addFrontendToastOnly(
     type,
     message,
-    title = "",
+    title = '',
     display_time = 5,
-    group = "",
+    group = '',
     priority = defaultPriority
   ) {
     const timestamp = new Date().toISOString();
@@ -554,7 +545,7 @@ const model = {
       type: type,
       title: title,
       message: message,
-      detail: "",
+      detail: '',
       timestamp: timestamp,
       display_time: display_time,
       read: false,
@@ -567,10 +558,8 @@ const model = {
     this.adjustNotificationData(notification);
 
     // If notification has a group, remove any existing toasts with the same group
-    if (group && String(group).trim() !== "") {
-      const existingToastIndex = this.toastStack.findIndex(
-        (t) => t.group === group
-      );
+    if (group && String(group).trim() !== '') {
+      const existingToastIndex = this.toastStack.findIndex((t) => t.group === group);
 
       if (existingToastIndex >= 0) {
         const existingToast = this.toastStack[existingToastIndex];
@@ -612,9 +601,9 @@ const model = {
   async addFrontendToast(
     type,
     message,
-    title = "",
+    title = '',
     display_time = 5,
-    group = "",
+    group = '',
     priority = defaultPriority,
     frontendOnly = false
   ) {
@@ -626,7 +615,7 @@ const model = {
             type,
             message,
             title,
-            "",
+            '',
             display_time,
             group,
             priority
@@ -643,27 +632,20 @@ const model = {
           );
         }
       } else {
-        console.log("Backend disconnected, showing as frontend-only toast");
+        console.log('Backend disconnected, showing as frontend-only toast');
       }
     }
-    
+
     // Fallback to frontend-only toast
-    return this.addFrontendToastOnly(
-      type,
-      message,
-      title,
-      display_time,
-      group,
-      priority
-    );
+    return this.addFrontendToastOnly(type, message, title, display_time, group, priority);
   },
 
   // NEW: Convenience methods for frontend notifications (updated to use new backend-first logic)
   async frontendError(
     message,
-    title = "Connection Error",
+    title = 'Connection Error',
     display_time = 8,
-    group = "",
+    group = '',
     priority = defaultPriority,
     frontendOnly = false
   ) {
@@ -680,9 +662,9 @@ const model = {
 
   async frontendWarning(
     message,
-    title = "Warning",
+    title = 'Warning',
     display_time = 5,
-    group = "",
+    group = '',
     priority = defaultPriority
   ) {
     return await this.addFrontendToast(
@@ -698,9 +680,9 @@ const model = {
 
   async frontendInfo(
     message,
-    title = "Info",
+    title = 'Info',
     display_time = 3,
-    group = "",
+    group = '',
     priority = defaultPriority,
     frontendOnly = false
   ) {
@@ -717,9 +699,9 @@ const model = {
 
   async frontendSuccess(
     message,
-    title = "Success",
+    title = 'Success',
     display_time = 3,
-    group = "",
+    group = '',
     priority = defaultPriority,
     frontendOnly = false
   ) {
@@ -736,9 +718,9 @@ const model = {
 
   async frontendProgress(
     message,
-    title = "Progress",
+    title = 'Progress',
     display_time = 3,
-    group = "",
+    group = '',
     priority = defaultPriority,
     frontendOnly = false
   ) {
@@ -773,14 +755,22 @@ const model = {
     displayTime = 5,
     group = '',
     priority = defaultPriority,
-    frontendOnly = false
+    frontendOnly = false,
   }) {
-    return await this.addFrontendToast(type, message, title, displayTime, group, priority, frontendOnly);
+    return await this.addFrontendToast(
+      type,
+      message,
+      title,
+      displayTime,
+      group,
+      priority,
+      frontendOnly
+    );
   },
 };
 
 // Create and export the store
-const store = createStore("notificationStore", model);
+const store = createStore('notificationStore', model);
 export { store };
 
 // export toast functions

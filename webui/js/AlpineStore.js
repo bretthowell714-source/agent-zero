@@ -21,13 +21,13 @@ export function createStore(name, initialState) {
       const store = globalThis.Alpine?.store(name);
       if (store) return store[prop];
       return target[prop];
-    }
+    },
   });
 
   if (globalThis.Alpine) {
     globalThis.Alpine.store(name, initialState);
   } else {
-    document.addEventListener("alpine:init", () => Alpine.store(name, initialState));
+    document.addEventListener('alpine:init', () => Alpine.store(name, initialState));
   }
 
   // Store the proxy
@@ -71,13 +71,13 @@ export function saveState(store, include = [], exclude = []) {
     }
 
     const value = store[key];
-    if (typeof value === "function") continue;
+    if (typeof value === 'function') continue;
 
     if (Array.isArray(value)) {
       snapshot[key] = value.map((item) =>
-        typeof item === "object" && item !== null ? { ...item } : item
+        typeof item === 'object' && item !== null ? { ...item } : item
       );
-    } else if (typeof value === "object" && value !== null) {
+    } else if (typeof value === 'object' && value !== null) {
       snapshot[key] = { ...value };
     } else {
       snapshot[key] = value;
@@ -112,9 +112,9 @@ export function loadState(store, state, include = [], exclude = []) {
 
     if (Array.isArray(value)) {
       store[key] = value.map((item) =>
-        typeof item === "object" && item !== null ? { ...item } : item
+        typeof item === 'object' && item !== null ? { ...item } : item
       );
-    } else if (typeof value === "object" && value !== null) {
+    } else if (typeof value === 'object' && value !== null) {
       store[key] = { ...value };
     } else {
       store[key] = value;

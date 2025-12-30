@@ -1,4 +1,4 @@
-import { createStore } from "/js/AlpineStore.js";
+import { createStore } from '/js/AlpineStore.js';
 
 const model = {
   // State
@@ -21,9 +21,10 @@ const model = {
    */
   async open(imageUrl, refreshOrOptions) {
     // Parse options (backward compatibility)
-    const options = typeof refreshOrOptions === 'number' 
-      ? { refreshInterval: refreshOrOptions, name: null }
-      : refreshOrOptions || {};
+    const options =
+      typeof refreshOrOptions === 'number'
+        ? { refreshInterval: refreshOrOptions, name: null }
+        : refreshOrOptions || {};
 
     // Reset state
     this.baseImageUrl = imageUrl;
@@ -34,14 +35,12 @@ const model = {
     this.zoomLevel = 1;
 
     // Add timestamp for cache-busting if refreshing
-    this.currentImageUrl = this.refreshInterval > 0 
-      ? this.addTimestamp(imageUrl) 
-      : imageUrl;
+    this.currentImageUrl = this.refreshInterval > 0 ? this.addTimestamp(imageUrl) : imageUrl;
 
     try {
       // Open modal and track close promise for cleanup
       this.closePromise = window.openModal('modals/image-viewer/image-viewer.html');
-      
+
       // Setup cleanup on modal close
       if (this.closePromise && typeof this.closePromise.finally === 'function') {
         this.closePromise.finally(() => {
@@ -55,7 +54,7 @@ const model = {
         this.setupAutoRefresh();
       }
     } catch (error) {
-      console.error("Image viewer error:", error);
+      console.error('Image viewer error:', error);
       this.imageError = true;
     }
   },
@@ -75,7 +74,7 @@ const model = {
 
   async preloadNextImage() {
     const nextSrc = this.addTimestamp(this.baseImageUrl);
-    
+
     // Create a promise that resolves when the image is loaded
     const preloadPromise = new Promise((resolve, reject) => {
       const tempImg = new Image();
@@ -87,7 +86,7 @@ const model = {
     try {
       // Wait for preload to complete
       const loadedSrc = await preloadPromise;
-      
+
       // Check if modal is still visible before updating
       if (this.isModalVisible()) {
         this.currentImageUrl = loadedSrc;
@@ -101,7 +100,7 @@ const model = {
   isModalVisible() {
     const container = document.querySelector('#image-viewer-wrapper');
     if (!container) return false;
-    
+
     // Check if element or any parent is hidden
     let element = container;
     while (element) {
@@ -148,7 +147,7 @@ const model = {
   },
 
   updateImageZoom() {
-    const img = document.querySelector(".modal-image");
+    const img = document.querySelector('.modal-image');
     if (img) {
       img.style.transform = `scale(${this.zoomLevel})`;
     }
@@ -158,9 +157,9 @@ const model = {
   addTimestamp(url) {
     try {
       const urlObj = new URL(url, window.location.origin);
-      urlObj.searchParams.set("t", Date.now().toString());
+      urlObj.searchParams.set('t', Date.now().toString());
       return urlObj.toString();
-    } catch (e) {
+    } catch (_e) {
       // Fallback for invalid URLs
       const separator = url.includes('?') ? '&' : '?';
       return `${url}${separator}t=${Date.now()}`;
@@ -171,9 +170,9 @@ const model = {
     try {
       const urlObj = new URL(url, window.location.origin);
       const pathname = urlObj.pathname;
-      return pathname.split("/").pop() || "Image";
-    } catch (e) {
-      return url.split("/").pop() || "Image";
+      return pathname.split('/').pop() || 'Image';
+    } catch (_e) {
+      return url.split('/').pop() || 'Image';
     }
   },
 
@@ -184,5 +183,4 @@ const model = {
   },
 };
 
-export const store = createStore("imageViewer", model);
-
+export const store = createStore('imageViewer', model);

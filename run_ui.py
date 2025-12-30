@@ -8,8 +8,8 @@ import socket
 import struct
 from functools import wraps
 import threading
-from flask import Flask, request, Response, session, redirect, url_for, render_template_string
-from werkzeug.wrappers.response import Response as BaseResponse
+from flask import Flask, request, Response, session, redirect, url_for, render_template_string # pyright: ignore[reportMissingImports]
+from werkzeug.wrappers.response import Response as BaseResponse # pyright: ignore[reportMissingImports]
 import initialize
 from python.helpers import files, git, mcp_server, fasta2a_server
 from python.helpers.files import get_abs_path
@@ -18,6 +18,9 @@ from python.helpers.extract_tools import load_classes_from_folder
 from python.helpers.api import ApiHandler
 from python.helpers.print_style import PrintStyle
 from python.helpers import login
+from opentelemetry.instrumentation.flask import FlaskInstrumentor # pyright: ignore[reportMissingImports]
+from opentelemetry.instrumentation.requests import RequestsInstrumentor # pyright: ignore[reportMissingImports]
+from opentelemetry import trace
 
 # disable logging
 import logging
@@ -29,7 +32,7 @@ os.environ["TZ"] = "UTC"
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
 # Apply the timezone change
 if hasattr(time, 'tzset'):
-    time.tzset()
+    time.tzset() # pyright: ignore[reportAttributeAccessIssue]
 
 # initialize the internal Flask server
 webapp = Flask("app", static_folder=get_abs_path("./webui"), static_url_path="/")
@@ -191,10 +194,10 @@ def run():
     PrintStyle().print("Initializing framework...")
 
     # Suppress only request logs but keep the startup messages
-    from werkzeug.serving import WSGIRequestHandler
-    from werkzeug.serving import make_server
-    from werkzeug.middleware.dispatcher import DispatcherMiddleware
-    from a2wsgi import ASGIMiddleware
+    from werkzeug.serving import WSGIRequestHandler # pyright: ignore[reportMissingImports]
+    from werkzeug.serving import make_server # pyright: ignore[reportMissingImports]
+    from werkzeug.middleware.dispatcher import DispatcherMiddleware # pyright: ignore[reportMissingImports]
+    from a2wsgi import ASGIMiddleware # pyright: ignore[reportMissingImports]
 
     PrintStyle().print("Starting server...")
 
@@ -277,6 +280,14 @@ def init_a0():
     # preload
     initialize.initialize_preload()
 
+# Instrument Flask and Requests
+FlaskInstrumentor().instrument_app(webapp)
+RequestsInstrumentor().instrument()
+
+# Example span for UI initialization
+tracer = trace.get_tracer(__name__)
+with tracer.start_as_current_span("ui-initialization"):
+    print("UI initialization traced.")
 
 
 # run the internal server

@@ -1,16 +1,16 @@
-import { createStore } from "/js/AlpineStore.js";
-import { updateChatInput, sendMessage } from "/index.js";
-import { sleep } from "/js/sleep.js";
-import { store as microphoneSettingStore } from "/components/settings/speech/microphone-setting-store.js";
-import * as shortcuts from "/js/shortcuts.js";
+import { createStore } from '/js/AlpineStore.js';
+import { updateChatInput, sendMessage } from '/index.js';
+import { sleep } from '/js/sleep.js';
+import { store as microphoneSettingStore } from '/components/settings/speech/microphone-setting-store.js';
+import * as shortcuts from '/js/shortcuts.js';
 
 const Status = {
-  INACTIVE: "inactive",
-  ACTIVATING: "activating",
-  LISTENING: "listening",
-  RECORDING: "recording",
-  WAITING: "waiting",
-  PROCESSING: "processing",
+  INACTIVE: 'inactive',
+  ACTIVATING: 'activating',
+  LISTENING: 'listening',
+  RECORDING: 'recording',
+  WAITING: 'waiting',
+  PROCESSING: 'processing',
 };
 
 // Create the speech store
@@ -19,8 +19,8 @@ const model = {
   _initialized: false,
 
   // STT Settings
-  stt_model_size: "tiny",
-  stt_language: "en",
+  stt_model_size: 'tiny',
+  stt_language: 'en',
   stt_silence_threshold: 0.05,
   stt_silence_duration: 1000,
   stt_waiting_timeout: 2000,
@@ -30,8 +30,8 @@ const model = {
 
   // TTS State
   isSpeaking: false,
-  speakingId: "",
-  speakingText: "",
+  speakingId: '',
+  speakingText: '',
   currentAudio: null,
   audioEl: null,
   audioContext: null,
@@ -50,19 +50,19 @@ const model = {
   },
 
   updateMicrophoneButtonUI() {
-    const microphoneButton = document.getElementById("microphone-button");
+    const microphoneButton = document.getElementById('microphone-button');
     if (!microphoneButton) return;
     const status = this.micStatus;
     microphoneButton.classList.remove(
-      "mic-inactive",
-      "mic-activating",
-      "mic-listening",
-      "mic-recording",
-      "mic-waiting",
-      "mic-processing"
+      'mic-inactive',
+      'mic-activating',
+      'mic-listening',
+      'mic-recording',
+      'mic-waiting',
+      'mic-processing'
     );
     microphoneButton.classList.add(`mic-${status.toLowerCase()}`);
-    microphoneButton.setAttribute("data-status", status);
+    microphoneButton.setAttribute('data-status', status);
   },
 
   async handleMicrophoneClick() {
@@ -74,7 +74,7 @@ const model = {
       if (device != this.selectedDevice) {
         this.selectedDevice = device;
         this.microphoneInput = null;
-        console.log("Device changed, microphoneInput reset");
+        console.log('Device changed, microphoneInput reset');
       }
 
       if (!this.microphoneInput) {
@@ -95,9 +95,7 @@ const model = {
   async init() {
     // Guard against multiple initializations
     if (this._initialized) {
-      console.log(
-        "[Speech Store] Already initialized, skipping duplicate init()"
-      );
+      console.log('[Speech Store] Already initialized, skipping duplicate init()');
       return;
     }
 
@@ -110,22 +108,20 @@ const model = {
   // Load settings from server
   async loadSettings() {
     try {
-      const response = await fetchApi("/settings_get", { method: "POST" });
+      const response = await fetchApi('/settings_get', { method: 'POST' });
       const data = await response.json();
-      const speechSection = data.settings.sections.find(
-        (s) => s.title === "Speech"
-      );
+      const speechSection = data.settings.sections.find((s) => s.title === 'Speech');
 
       if (speechSection) {
         speechSection.fields.forEach((field) => {
-          if (this.hasOwnProperty(field.id)) {
+          if (Object.prototype.hasOwnProperty.call(this, field.id)) {
             this[field.id] = field.value;
           }
         });
       }
     } catch (error) {
-      window.toastFetchError("Failed to load speech settings", error);
-      console.error("Failed to load speech settings:", error);
+      window.toastFetchError('Failed to load speech settings', error);
+      console.error('Failed to load speech settings:', error);
     }
   },
 
@@ -140,21 +136,20 @@ const model = {
     const enableAudio = () => {
       if (!this.userHasInteracted) {
         this.userHasInteracted = true;
-        console.log("User interaction detected - audio playback enabled");
+        console.log('User interaction detected - audio playback enabled');
 
         // Create a dummy audio context to "unlock" audio
         try {
-          this.audioContext = new (window.AudioContext ||
-            window.webkitAudioContext)();
+          this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
           this.audioContext.resume();
-        } catch (e) {
-          console.log("AudioContext not available");
+        } catch (_e) {
+          console.log('AudioContext not available');
         }
       }
     };
 
     // Listen for any user interaction
-    const events = ["click", "touchstart", "keydown", "mousedown"];
+    const events = ['click', 'touchstart', 'keydown', 'mousedown'];
     events.forEach((event) => {
       document.addEventListener(event, enableAudio, {
         once: true,
@@ -209,20 +204,14 @@ const model = {
     else this.ttsStream.running = true; // proceed to running phase
 
     // terminator function to kill the stream if new stream has started
-    const terminator = () =>
-      this.ttsStream?.id !== id || this.ttsStream?.stopped;
+    const terminator = () => this.ttsStream?.id !== id || this.ttsStream?.stopped;
 
     const spoken = [];
 
     // loop chunks from last spoken chunk index
-    for (
-      let i = this.ttsStream.lastChunkIndex + 1;
-      i < this.ttsStream.chunks.length;
-      i++
-    ) {
+    for (let i = this.ttsStream.lastChunkIndex + 1; i < this.ttsStream.chunks.length; i++) {
       // do not speak the last chunk until finished (it is being generated)
-      if (i == this.ttsStream.chunks.length - 1 && !this.ttsStream.finished)
-        break;
+      if (i == this.ttsStream.chunks.length - 1 && !this.ttsStream.finished) break;
 
       // set the index of last spoken chunk
       this.ttsStream.lastChunkIndex = i;
@@ -245,8 +234,7 @@ const model = {
   // speak wrapper
   async _speak(text, waitForPrevious, terminator) {
     // default browser speech
-    if (!this.tts_kokoro)
-      return await this.speakWithBrowser(text, waitForPrevious, terminator);
+    if (!this.tts_kokoro) return await this.speakWithBrowser(text, waitForPrevious, terminator);
 
     // kokoro tts
     try {
@@ -257,7 +245,7 @@ const model = {
     }
   },
 
-  chunkText(text, { maxChunkLength = 135, lineSeparator = "..." } = {}) {
+  chunkText(text, { maxChunkLength = 135, lineSeparator = '...' } = {}) {
     const INC_LIMIT = maxChunkLength * 2;
     const MIN_CHUNK_LENGTH = 20; // minimum length for a chunk before merging
 
@@ -267,20 +255,20 @@ const model = {
       const byComma = seg.match(/[^,]+(?:,|$)/g);
       if (byComma.length > 1)
         return byComma.flatMap((p, i) =>
-          splitDeep(i < byComma.length - 1 ? p : p.replace(/,$/, ""))
+          splitDeep(i < byComma.length - 1 ? p : p.replace(/,$/, ''))
         );
       const out = [];
-      let part = "";
+      let part = '';
       for (const word of seg.split(/\s+/)) {
         const need = part ? part.length + 1 + word.length : word.length;
         if (need <= maxChunkLength) {
-          part += (part ? " " : "") + word;
+          part += (part ? ' ' : '') + word;
         } else {
           if (part) out.push(part);
           if (word.length > maxChunkLength) {
             for (let i = 0; i < word.length; i += maxChunkLength)
               out.push(word.slice(i, i + maxChunkLength));
-            part = "";
+            part = '';
           } else {
             part = word;
           }
@@ -296,10 +284,7 @@ const model = {
       let start = 0;
       for (let i = 0; i < line.length; i++) {
         const c = line[i];
-        if (
-          (c === "." || c === "!" || c === "?") &&
-          /\s/.test(line[i + 1] || "")
-        ) {
+        if ((c === '.' || c === '!' || c === '?') && /\s/.test(line[i + 1] || '')) {
           toks.push(line.slice(start, i + 1));
           i += 1;
           start = i + 1;
@@ -322,7 +307,7 @@ const model = {
 
     // Step 2: Merge short chunks until they meet minimum length criteria
     const finalChunks = [];
-    let currentChunk = "";
+    let currentChunk = '';
 
     for (let i = 0; i < initialChunks.length; i++) {
       const chunk = initialChunks[i];
@@ -331,12 +316,9 @@ const model = {
       if (!currentChunk) {
         currentChunk = chunk;
         // If this is the last chunk or it's already long enough, add it
-        if (
-          i === initialChunks.length - 1 ||
-          currentChunk.length >= MIN_CHUNK_LENGTH
-        ) {
+        if (i === initialChunks.length - 1 || currentChunk.length >= MIN_CHUNK_LENGTH) {
           finalChunks.push(currentChunk);
-          currentChunk = "";
+          currentChunk = '';
         }
         continue;
       }
@@ -344,7 +326,7 @@ const model = {
       // Current chunk exists, check if we should merge
       if (currentChunk.length < MIN_CHUNK_LENGTH) {
         // Try to merge with separator
-        const merged = currentChunk + " " + lineSeparator + " " + chunk;
+        const merged = currentChunk + ' ' + lineSeparator + ' ' + chunk;
 
         // Check if merged chunk fits within max length
         if (merged.length <= maxChunkLength) {
@@ -372,12 +354,12 @@ const model = {
   // Show a prompt to user to enable audio
   showAudioPermissionPrompt() {
     shortcuts.frontendNotification({
-      type: "info",
-      message: "Click anywhere to enable audio playback",
+      type: 'info',
+      message: 'Click anywhere to enable audio playback',
       displayTime: 5000,
       frontendOnly: true,
     });
-    console.log("Please click anywhere on the page to enable audio playback");
+    console.log('Please click anywhere on the page to enable audio playback');
   },
 
   // Browser TTS
@@ -404,7 +386,7 @@ const model = {
   async speakWithKokoro(text, waitForPrevious = false, terminator = null) {
     try {
       // synthesize on the backend
-      const response = await sendJsonData("/synthesize", { text });
+      const response = await sendJsonData('/synthesize', { text });
 
       // wait for previous to finish if requested
       while (waitForPrevious && this.isSpeaking) await sleep(25);
@@ -426,10 +408,10 @@ const model = {
           this.playAudio(response.audio);
         }
       } else {
-        throw new Error("Kokoro TTS error:", response.error);
+        throw new Error('Kokoro TTS error:', response.error);
       }
     } catch (error) {
-      throw new Error("Kokoro TTS error:", error);
+      throw new Error('Kokoro TTS error:', error);
     }
   },
 
@@ -463,7 +445,7 @@ const model = {
         this.isSpeaking = false;
         this.currentAudio = null;
 
-        if (error.name === "NotAllowedError") {
+        if (error.name === 'NotAllowedError') {
           this.showAudioPermissionPrompt();
           this.userHasInteracted = false;
         }
@@ -495,20 +477,15 @@ const model = {
   // Clean text for TTS
   cleanText(text) {
     // Use SUB character (ASCII 26, 0x1A) for placeholders to avoid conflicts with actual text
-    const SUB = "\x1A"; // non-printable substitute character
-    const codePlaceholder = SUB + "code" + SUB;
-    const tablePlaceholder = SUB + "table" + SUB;
+    const SUB = '\x1A'; // non-printable substitute character
+    const codePlaceholder = SUB + 'code' + SUB;
+    const tablePlaceholder = SUB + 'table' + SUB;
 
     // Helper function to handle both closed and unclosed patterns
     // replacement can be a string or null (to remove)
-    function handlePatterns(
-      inputText,
-      closedPattern,
-      unclosedPattern,
-      replacement
-    ) {
+    function handlePatterns(inputText, closedPattern, unclosedPattern, replacement) {
       // Process closed patterns first
-      let processed = inputText.replace(closedPattern, replacement || "");
+      let processed = inputText.replace(closedPattern, replacement || '');
 
       // If the text changed, it means we found and replaced closed patterns
       if (processed !== inputText) {
@@ -518,7 +495,7 @@ const model = {
         const unclosedMatch = inputText.match(unclosedPattern);
         if (unclosedMatch) {
           // Replace the unclosed pattern
-          return inputText.replace(unclosedPattern, replacement || "");
+          return inputText.replace(unclosedPattern, replacement || '');
         }
       }
 
@@ -535,14 +512,14 @@ const model = {
     );
 
     // Replace inline code ticks with content preserved
-    text = text.replace(/`([^`]*)`/g, "$1"); // remove backticks but keep content
+    text = text.replace(/`([^`]*)`/g, '$1'); // remove backticks but keep content
 
     // Handle HTML tags
     text = handlePatterns(
       text,
       /<[a-zA-Z][a-zA-Z0-9]*>.*?<\/[a-zA-Z][a-zA-Z0-9]*>/gs, // closed HTML tags
       /<[a-zA-Z][a-zA-Z0-9]*>[\s\S]*$/g, // unclosed HTML tags
-      "" // remove HTML tags completely
+      '' // remove HTML tags completely
     );
 
     // Handle self-closing HTML tags
@@ -550,22 +527,22 @@ const model = {
       text,
       /<[a-zA-Z][a-zA-Z0-9]*(\/| [^>]*\/>)/g, // complete self-closing tags
       /<[a-zA-Z][a-zA-Z0-9]* [^>]*$/g, // incomplete self-closing tags
-      ""
+      ''
     );
 
     // Remove markdown links: [label](url) → label
-    text = text.replace(/\[([^\]]+)\]\([^\)]+\)/g, "$1");
+    text = text.replace(/\[([^\]]+)\]\([^)]+\)/g, '$1');
 
     // Remove markdown formatting: *, _, #
-    text = text.replace(/[*_#]+/g, "");
+    text = text.replace(/[*_#]+/g, '');
 
     // Handle tables - both complete and partial
     // Check if text contains a table-like pattern
-    if (text.includes("|")) {
+    if (text.includes('|')) {
       // Find consecutive lines with | characters (table rows)
       const tableLines = text
-        .split("\n")
-        .filter((line) => line.includes("|") && line.trim().startsWith("|"));
+        .split('\n')
+        .filter((line) => line.includes('|') && line.trim().startsWith('|'));
       if (tableLines.length > 0) {
         // Replace each table line with a placeholder
         for (const line of tableLines) {
@@ -580,7 +557,7 @@ const model = {
     // Remove emojis and private unicode blocks
     text = text.replace(
       /([\u2700-\u27BF]|[\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|[\u2011-\u26FF]|\uD83E[\uDD10-\uDDFF])/g,
-      ""
+      ''
     );
 
     // Replace URLs with just the domain name
@@ -588,7 +565,7 @@ const model = {
       try {
         return new URL(match).hostname;
       } catch {
-        return "";
+        return '';
       }
     });
 
@@ -596,29 +573,26 @@ const model = {
     // text = text.replace(/\S+@\S+/g, "");
 
     // Replace UUIDs with 'UUID'
-    text = text.replace(
-      /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/g,
-      "UUID"
-    );
+    text = text.replace(/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/g, 'UUID');
 
     // Collapse multiple spaces/tabs to a single space, but preserve newlines
-    text = text.replace(/[ \t]+/g, " ");
+    text = text.replace(/[ \t]+/g, ' ');
 
     // Function to merge consecutive placeholders of any type
     function mergePlaceholders(txt, placeholder, replacement) {
       // Create regex for consecutive placeholders (with possible whitespace between)
-      const regex = new RegExp(placeholder + "\\s*" + placeholder, "g");
+      const regex = new RegExp(placeholder + '\\s*' + placeholder, 'g');
       // Merge consecutive placeholders until no more found
       while (regex.test(txt)) {
         txt = txt.replace(regex, placeholder);
       }
       // Replace all remaining placeholders with human-readable text
-      return txt.replace(new RegExp(placeholder, "g"), replacement);
+      return txt.replace(new RegExp(placeholder, 'g'), replacement);
     }
 
     // Apply placeholder merging for both types
-    text = mergePlaceholders(text, codePlaceholder, "See code attached ...");
-    text = mergePlaceholders(text, tablePlaceholder, "See table attached ...");
+    text = mergePlaceholders(text, codePlaceholder, 'See code attached ...');
+    text = mergePlaceholders(text, tablePlaceholder, 'See table attached ...');
 
     // Trim leading/trailing whitespace
     text = text.trim();
@@ -641,7 +615,7 @@ const model = {
   },
 
   async sendMessage(text) {
-    text = "(voice) " + text;
+    text = '(voice) ' + text;
     updateChatInput(text);
     if (!this.microphoneInput.messageSent) {
       this.microphoneInput.messageSent = true;
@@ -728,8 +702,8 @@ class MicrophoneInput {
       this.setupAudioAnalysis(stream);
       return true;
     } catch (error) {
-      console.error("Microphone initialization error:", error);
-      toast("Failed to access microphone. Please check permissions.", "error");
+      console.error('Microphone initialization error:', error);
+      toast('Failed to access microphone. Please check permissions.', 'error');
       return false;
     }
   }
@@ -778,10 +752,10 @@ class MicrophoneInput {
   }
 
   handleRecordingState() {
-    if (!this.hasStartedRecording && this.mediaRecorder.state !== "recording") {
+    if (!this.hasStartedRecording && this.mediaRecorder.state !== 'recording') {
       this.hasStartedRecording = true;
       this.mediaRecorder.start(1000);
-      console.log("Speech started");
+      console.log('Speech started');
     }
     if (this.waitingTimer) {
       clearTimeout(this.waitingTimer);
@@ -803,8 +777,7 @@ class MicrophoneInput {
   }
 
   setupAudioAnalysis(stream) {
-    this.audioContext = new (window.AudioContext ||
-      window.webkitAudioContext)();
+    this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
     this.mediaStreamSource = this.audioContext.createMediaStreamSource(stream);
     this.analyserNode = this.audioContext.createAnalyser();
     this.analyserNode.fftSize = 2048;
@@ -835,8 +808,7 @@ class MicrophoneInput {
         this.silenceStartTime = null;
 
         if (
-          (this.status === Status.LISTENING ||
-            this.status === Status.WAITING) &&
+          (this.status === Status.LISTENING || this.status === Status.WAITING) &&
           !store.isSpeaking
         ) {
           this.status = Status.RECORDING;
@@ -866,7 +838,7 @@ class MicrophoneInput {
   }
 
   stopRecording() {
-    if (this.mediaRecorder?.state === "recording") {
+    if (this.mediaRecorder?.state === 'recording') {
       this.mediaRecorder.stop();
       this.hasStartedRecording = false;
     }
@@ -882,20 +854,20 @@ class MicrophoneInput {
       return;
     }
 
-    const audioBlob = new Blob(this.audioChunks, { type: "audio/wav" });
+    const audioBlob = new Blob(this.audioChunks, { type: 'audio/wav' });
     const base64 = await this.convertBlobToBase64Wav(audioBlob);
 
     try {
-      const result = await sendJsonData("/transcribe", { audio: base64 });
-      const text = this.filterResult(result.text || "");
+      const result = await sendJsonData('/transcribe', { audio: base64 });
+      const text = this.filterResult(result.text || '');
 
       if (text) {
-        console.log("Transcription:", result.text);
+        console.log('Transcription:', result.text);
         await this.updateCallback(result.text, true);
       }
     } catch (error) {
-      window.toastFetchError("Transcription error", error);
-      console.error("Transcription error:", error);
+      window.toastFetchError('Transcription error', error);
+      console.error('Transcription error:', error);
     } finally {
       this.audioChunks = [];
       this.status = Status.LISTENING;
@@ -906,7 +878,7 @@ class MicrophoneInput {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.onloadend = () => {
-        const base64Data = reader.result.split(",")[1];
+        const base64Data = reader.result.split(',')[1];
         resolve(base64Data);
       };
       reader.onerror = (error) => reject(error);
@@ -919,9 +891,9 @@ class MicrophoneInput {
     let ok = false;
     while (!ok) {
       if (!text) break;
-      if (text[0] === "{" && text[text.length - 1] === "}") break;
-      if (text[0] === "(" && text[text.length - 1] === ")") break;
-      if (text[0] === "[" && text[text.length - 1] === "]") break;
+      if (text[0] === '{' && text[text.length - 1] === '}') break;
+      if (text[0] === '(' && text[text.length - 1] === ')') break;
+      if (text[0] === '[' && text[text.length - 1] === ']') break;
       ok = true;
     }
     if (ok) return text;
@@ -947,21 +919,21 @@ class MicrophoneInput {
       await navigator.mediaDevices.getUserMedia({ audio: true });
       return true;
     } catch (err) {
-      console.error("Error accessing microphone:", err);
+      console.error('Error accessing microphone:', err);
       toast(
-        "Microphone access denied. Please enable microphone access in your browser settings.",
-        "error"
+        'Microphone access denied. Please enable microphone access in your browser settings.',
+        'error'
       );
       return false;
     }
   }
 }
 
-export const store = createStore("speech", model);
+export const store = createStore('speech', model);
 
 // Initialize speech store
 // window.speechStore = speechStore;
 
 // Event listeners
-document.addEventListener("settings-updated", () => store.loadSettings());
+document.addEventListener('settings-updated', () => store.loadSettings());
 // document.addEventListener("DOMContentLoaded", () => speechStore.init());

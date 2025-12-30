@@ -1,8 +1,8 @@
 // Create and keep a reference to a dynamic stylesheet for runtime CSS changes
 let dynamicStyleSheet;
 {
-  const style = document.createElement("style");
-  style.appendChild(document.createTextNode(""));
+  const style = document.createElement('style');
+  style.appendChild(document.createTextNode(''));
   document.head.appendChild(style);
   dynamicStyleSheet = style.sheet;
 }
@@ -17,7 +17,7 @@ export function toggleCssProperty(selector, property, value) {
     let rules;
     try {
       rules = styleSheet.cssRules || styleSheet.rules;
-    } catch (e) {
+    } catch (_e) {
       // Skip stylesheets we cannot access due to CORS/security restrictions
       continue;
     }
@@ -42,9 +42,9 @@ export function toggleCssProperty(selector, property, value) {
 
 // Helper to apply/remove a CSS property on a rule
 function _applyCssToRule(rule, property, value) {
-    if (value === undefined) {
-      rule.style.removeProperty(property);
-    } else {
-      rule.style.setProperty(property, value);
-    }
+  if (value === undefined) {
+    rule.style.removeProperty(property);
+  } else {
+    rule.style.setProperty(property, value);
   }
+}

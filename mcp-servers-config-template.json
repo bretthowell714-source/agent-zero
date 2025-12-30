@@ -1,0 +1,98 @@
+{
+  "$schema": "https://raw.githubusercontent.com/anthropics/anthropic-mcp/main/schema/mcp_config_schema.json",
+  "mcpServers": {
+    "filesystem": {
+      "command": "npx",
+      "args": [
+        "--yes",
+        "--package",
+        "@modelcontextprotocol/server-filesystem",
+        "mcp-server-filesystem",
+        "c:\\Users\\brett\\agent-zero"
+      ],
+      "disabled": false
+    },
+    "brave-search": {
+      "command": "npx",
+      "args": [
+        "--yes",
+        "--package",
+        "@modelcontextprotocol/server-brave-search",
+        "mcp-server-brave-search"
+      ],
+      "env": {
+        "BRAVE_API_KEY": "YOUR_API_KEY_HERE"
+      },
+      "disabled": true
+    },
+    "sequential-thinking": {
+      "command": "npx",
+      "args": [
+        "--yes",
+        "--package",
+        "@modelcontextprotocol/server-sequential-thinking",
+        "mcp-server-sequential-thinking"
+      ],
+      "disabled": false
+    },
+    "fetch": {
+      "command": "npx",
+      "args": [
+        "--yes",
+        "--package",
+        "@tokenizin/mcp-npx-fetch",
+        "mcp-npx-fetch",
+        "--ignore-robots-txt",
+        "--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+      ],
+      "disabled": false
+    },
+    "git": {
+      "command": "npx",
+      "args": [
+        "--yes",
+        "--package",
+        "@modelcontextprotocol/server-git",
+        "mcp-server-git",
+        "--repository",
+        "c:\\Users\\brett\\agent-zero"
+      ],
+      "disabled": false
+    },
+    "github": {
+      "command": "npx",
+      "args": [
+        "--yes",
+        "--package",
+        "@modelcontextprotocol/server-github",
+        "mcp-server-github"
+      ],
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "YOUR_GITHUB_TOKEN_HERE"
+      },
+      "disabled": true
+    },
+    "sqlite": {
+      "command": "npx",
+      "args": [
+        "--yes",
+        "--package",
+        "@modelcontextprotocol/server-sqlite",
+        "mcp-server-sqlite",
+        "--db-path",
+        "c:\\Users\\brett\\agent-zero\\data\\database.db"
+      ],
+      "disabled": true
+    },
+    "docker": {
+      "command": "npx",
+      "args": [
+        "--yes",
+        "--package",
+        "@modelcontextprotocol/server-docker",
+        "mcp-server-docker"
+      ],
+      "disabled": true
+    }
+  }
+}

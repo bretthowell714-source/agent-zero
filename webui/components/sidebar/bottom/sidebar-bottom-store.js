@@ -1,14 +1,12 @@
-import { createStore } from "/js/AlpineStore.js";
+import { createStore } from '/js/AlpineStore.js';
 
 // Sidebar Bottom store manages version info display
 const model = {
-  versionNo: "",
-  commitTime: "",
+  versionNo: '',
+  commitTime: '',
 
   get versionLabel() {
-    return this.versionNo && this.commitTime
-      ? `Version ${this.versionNo} ${this.commitTime}`
-      : "";
+    return this.versionNo && this.commitTime ? `Version ${this.versionNo} ${this.commitTime}` : '';
   },
 
   init() {
@@ -21,5 +19,4 @@ const model = {
   },
 };
 
-export const store = createStore("sidebarBottom", model);
-
+export const store = createStore('sidebarBottom', model);

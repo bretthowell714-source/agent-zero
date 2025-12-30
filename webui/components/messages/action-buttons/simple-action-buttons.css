@@ -3,11 +3,11 @@
 /* Main action buttons container - precise positioning */
 .action-buttons {
   position: sticky;
-  height:0;
-  width:fit-content;
+  height: 0;
+  width: fit-content;
   overflow: visible;
   top: 0.3em;
-  margin-right:0.1em;
+  margin-right: 0.1em;
   margin-left: auto;
   display: none;
   flex-direction: row;
@@ -57,18 +57,26 @@
 .action-buttons .action-button .material-symbols-outlined {
   font-size: 16px;
   line-height: 1;
-  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 20;
+  font-variation-settings:
+    'FILL' 0,
+    'wght' 400,
+    'GRAD' 0,
+    'opsz' 20;
 }
 
 /* Success state - same as original */
 .action-buttons .action-button.success {
-  background: #4CAF50;
-  border-color: #4CAF50;
+  background: #4caf50;
+  border-color: #4caf50;
   color: white;
 }
 
 .action-buttons .action-button.success .material-symbols-outlined {
-  font-variation-settings: 'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 20;
+  font-variation-settings:
+    'FILL' 1,
+    'wght' 500,
+    'GRAD' 0,
+    'opsz' 20;
 }
 
 /* Error state - same as original */
@@ -79,7 +87,11 @@
 }
 
 .action-buttons .action-button.error .material-symbols-outlined {
-  font-variation-settings: 'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 20;
+  font-variation-settings:
+    'FILL' 1,
+    'wght' 500,
+    'GRAD' 0,
+    'opsz' 20;
 }
 
 /* Speaking state - same as original */
@@ -91,9 +103,15 @@
 }
 
 @keyframes pulse {
-  0% { opacity: 1; }
-  50% { opacity: 0.7; }
-  100% { opacity: 1; }
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+  100% {
+    opacity: 1;
+  }
 }
 
 /* Show action buttons on hover - simplified, no device detection needed */
@@ -111,6 +129,10 @@
 
 /* Animation to fade in action buttons after delay */
 @keyframes fadeInAfterDelay {
-  0% { opacity: 0; }
-  100% { opacity: 1; }
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
 }

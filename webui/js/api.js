@@ -7,11 +7,11 @@
  */
 export async function callJsonApi(endpoint, data) {
   const response = await fetchApi(endpoint, {
-    method: "POST",
+    method: 'POST',
     headers: {
-      "Content-Type": "application/json",
+      'Content-Type': 'application/json',
     },
-    credentials: "same-origin",
+    credentials: 'same-origin',
     body: JSON.stringify(data),
   });
 
@@ -42,7 +42,7 @@ export async function fetchApi(url, request) {
     finalRequest.headers = finalRequest.headers || {};
 
     // add the CSRF token to the headers
-    finalRequest.headers["X-CSRF-Token"] = token;
+    finalRequest.headers['X-CSRF-Token'] = token;
 
     // perform the fetch with the updated request
     const response = await fetch(url, finalRequest);
@@ -52,7 +52,7 @@ export async function fetchApi(url, request) {
       // retry the request with new token
       csrfToken = null;
       return await _wrap(false);
-    } else if (response.redirected && response.url.endsWith("/login")) {
+    } else if (response.redirected && response.url.endsWith('/login')) {
       // redirect to login
       window.location.href = response.url;
       return;
@@ -79,10 +79,10 @@ let csrfToken = null;
  */
 async function getCsrfToken() {
   if (csrfToken) return csrfToken;
-  const response = await fetch("/csrf_token", {
-    credentials: "same-origin",
+  const response = await fetch('/csrf_token', {
+    credentials: 'same-origin',
   });
-  if (response.redirected && response.url.endsWith("/login")) {
+  if (response.redirected && response.url.endsWith('/login')) {
     // redirect to login
     window.location.href = response.url;
     return;
@@ -94,6 +94,6 @@ async function getCsrfToken() {
     return csrfToken;
   } else {
     if (json.error) alert(json.error);
-    throw new Error(json.error || "Failed to get CSRF token");
+    throw new Error(json.error || 'Failed to get CSRF token');
   }
 }

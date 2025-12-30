@@ -1,4 +1,4 @@
-import { createStore } from "/js/AlpineStore.js";
+import { createStore } from '/js/AlpineStore.js';
 
 // Global function references
 const sendJsonData = globalThis.sendJsonData;
@@ -75,7 +75,9 @@ const model = {
 
     // Auto-scroll to bottom - use setTimeout since $nextTick is not available in stores
     setTimeout(() => {
-      const textarea = document.getElementById(this.mode === 'backup' ? 'backup-file-list' : 'restore-file-list');
+      const textarea = document.getElementById(
+        this.mode === 'backup' ? 'backup-file-list' : 'restore-file-list'
+      );
       if (textarea) {
         textarea.scrollTop = textarea.scrollHeight;
       }
@@ -105,7 +107,7 @@ const model = {
 
     try {
       // Get resolved default patterns from backend
-      const response = await sendJsonData("backup_get_defaults", {});
+      const response = await sendJsonData('backup_get_defaults', {});
 
       if (response.success) {
         // Use patterns from backend with resolved absolute paths
@@ -119,12 +121,12 @@ const model = {
           exclude_patterns: exclude_patterns,
           backup_config: {
             compression_level: 6,
-            integrity_check: true
-          }
+            integrity_check: true,
+          },
         };
       }
     } catch (error) {
-      console.warn("Failed to get default patterns from backend, using fallback");
+      console.warn('Failed to get default patterns from backend, using fallback');
     }
 
     // Fallback patterns (will be overridden by backend on first use)
@@ -133,30 +135,30 @@ const model = {
       include_hidden: false,
       include_patterns: [
         // These will be replaced with resolved absolute paths by backend
-        "# Loading default patterns from backend..."
+        '# Loading default patterns from backend...',
       ],
       exclude_patterns: [],
       backup_config: {
         compression_level: 6,
-        integrity_check: true
-      }
+        integrity_check: true,
+      },
     };
   },
 
   // Editor Management - Following Agent Zero ACE editor patterns
   async initBackupEditor() {
-    const container = document.getElementById("backup-metadata-editor");
+    const container = document.getElementById('backup-metadata-editor');
     if (container) {
-      const editor = ace.edit("backup-metadata-editor");
+      const editor = ace.edit('backup-metadata-editor');
 
-      const dark = localStorage.getItem("darkMode");
-      if (dark != "false") {
-        editor.setTheme("ace/theme/github_dark");
+      const dark = localStorage.getItem('darkMode');
+      if (dark != 'false') {
+        editor.setTheme('ace/theme/github_dark');
       } else {
-        editor.setTheme("ace/theme/tomorrow");
+        editor.setTheme('ace/theme/tomorrow');
       }
 
-      editor.session.setMode("ace/mode/json");
+      editor.session.setMode('ace/mode/json');
 
       // Initialize with default backup metadata
       const defaultMetadata = await this.getDefaultBackupMetadata();
@@ -177,18 +179,18 @@ const model = {
   },
 
   async initRestoreEditor() {
-    const container = document.getElementById("restore-metadata-editor");
+    const container = document.getElementById('restore-metadata-editor');
     if (container) {
-      const editor = ace.edit("restore-metadata-editor");
+      const editor = ace.edit('restore-metadata-editor');
 
-      const dark = localStorage.getItem("darkMode");
-      if (dark != "false") {
-        editor.setTheme("ace/theme/github_dark");
+      const dark = localStorage.getItem('darkMode');
+      if (dark != 'false') {
+        editor.setTheme('ace/theme/github_dark');
       } else {
-        editor.setTheme("ace/theme/tomorrow");
+        editor.setTheme('ace/theme/tomorrow');
       }
 
-      editor.session.setMode("ace/mode/json");
+      editor.session.setMode('ace/mode/json');
       editor.setValue('{}');
       editor.clearSelection();
 
@@ -221,8 +223,8 @@ const model = {
       editor.clearSelection();
       editor.navigateFileStart();
     } catch (error) {
-      console.error("Failed to format JSON:", error);
-      this.error = "Invalid JSON: " + error.message;
+      console.error('Failed to format JSON:', error);
+      this.error = 'Invalid JSON: ' + error.message;
     }
   },
 
@@ -240,14 +242,17 @@ const model = {
       }
 
       // Convert patterns arrays back to string format for API
-      const patternsString = this.convertPatternsToString(metadata.include_patterns, metadata.exclude_patterns);
+      const patternsString = this.convertPatternsToString(
+        metadata.include_patterns,
+        metadata.exclude_patterns
+      );
 
       // Get grouped preview for better UX
-      const response = await sendJsonData("backup_preview_grouped", {
+      const response = await sendJsonData('backup_preview_grouped', {
         patterns: patternsString,
         include_hidden: metadata.include_hidden || false,
         max_depth: 3,
-        search_filter: this.fileSearchFilter
+        search_filter: this.fileSearchFilter,
       });
 
       if (response.success) {
@@ -256,7 +261,7 @@ const model = {
 
         // Flatten groups for flat view
         this.previewFiles = [];
-        response.groups.forEach(group => {
+        response.groups.forEach((group) => {
           this.previewFiles.push(...group.files);
         });
 
@@ -280,7 +285,7 @@ const model = {
 
     // Add exclude patterns with '!' prefix
     if (excludePatterns) {
-      excludePatterns.forEach(pattern => {
+      excludePatterns.forEach((pattern) => {
         patterns.push(`!${pattern}`);
       });
     }
@@ -355,14 +360,14 @@ const model = {
       this.filteredPreviewFiles = this.previewFiles;
     } else {
       const search = this.fileSearchFilter.toLowerCase();
-      this.filteredPreviewFiles = this.previewFiles.filter(file =>
+      this.filteredPreviewFiles = this.previewFiles.filter((file) =>
         file.path.toLowerCase().includes(search)
       );
     }
   },
 
   async exportFileList() {
-    const fileList = this.previewFiles.map(f => f.path).join('\n');
+    const fileList = this.previewFiles.map((f) => f.path).join('\n');
     const blob = new Blob([fileList], { type: 'text/plain' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -373,7 +378,7 @@ const model = {
   },
 
   async copyFileListToClipboard() {
-    const fileList = this.previewFiles.map(f => f.path).join('\n');
+    const fileList = this.previewFiles.map((f) => f.path).join('\n');
     try {
       await navigator.clipboard.writeText(fileList);
       window.toastFrontendInfo('File list copied to clipboard', 'Clipboard');
@@ -405,8 +410,8 @@ const model = {
           include_patterns: metadata.include_patterns,
           exclude_patterns: metadata.exclude_patterns,
           include_hidden: metadata.include_hidden || false,
-          backup_name: metadata.backup_name
-        })
+          backup_name: metadata.backup_name,
+        }),
       });
 
       if (response.ok) {
@@ -432,7 +437,6 @@ const model = {
         }
         this.addFileOperation(`Error: ${this.error}`);
       }
-
     } catch (error) {
       this.error = `Backup error: ${error.message}`;
       this.addFileOperation(`Error: ${error.message}`);
@@ -446,7 +450,7 @@ const model = {
       const response = await fetchApi('/backup_download', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ backup_path: backupPath })
+        body: JSON.stringify({ backup_path: backupPath }),
       });
 
       if (response.ok) {
@@ -473,7 +477,7 @@ const model = {
   },
 
   resetToDefaults() {
-    this.getDefaultBackupMetadata().then(defaultMetadata => {
+    this.getDefaultBackupMetadata().then((defaultMetadata) => {
       if (this.backupEditor) {
         this.backupEditor.setValue(JSON.stringify(defaultMetadata, null, 2));
         this.backupEditor.clearSelection();
@@ -504,12 +508,15 @@ const model = {
       this.addFileOperation('Starting backup dry run...');
 
       const metadata = this.backupMetadataConfig;
-      const patternsString = this.convertPatternsToString(metadata.include_patterns, metadata.exclude_patterns);
+      const patternsString = this.convertPatternsToString(
+        metadata.include_patterns,
+        metadata.exclude_patterns
+      );
 
-      const response = await sendJsonData("backup_test", {
+      const response = await sendJsonData('backup_test', {
         patterns: patternsString,
         include_hidden: metadata.include_hidden || false,
-        max_files: 10000
+        max_files: 10000,
       });
 
       if (response.success) {
@@ -517,7 +524,9 @@ const model = {
         response.files.forEach((file, index) => {
           this.addFileOperation(`${index + 1}. ${file.path} (${this.formatFileSize(file.size)})`);
         });
-        this.addFileOperation(`\nTotal: ${response.files.length} files, ${this.formatFileSize(response.files.reduce((sum, f) => sum + f.size, 0))}`);
+        this.addFileOperation(
+          `\nTotal: ${response.files.length} files, ${this.formatFileSize(response.files.reduce((sum, f) => sum + f.size, 0))}`
+        );
         this.addFileOperation('Dry run completed successfully.');
       } else {
         this.error = response.error;
@@ -551,7 +560,7 @@ const model = {
 
       const response = await fetchApi('/backup_restore_preview', {
         method: 'POST',
-        body: formData
+        body: formData,
       });
 
       const result = await response.json();
@@ -559,7 +568,9 @@ const model = {
       if (result.success) {
         // Show delete operations if clean before restore is enabled
         if (result.files_to_delete && result.files_to_delete.length > 0) {
-          this.addFileOperation(`Clean before restore - ${result.files_to_delete.length} files would be deleted:`);
+          this.addFileOperation(
+            `Clean before restore - ${result.files_to_delete.length} files would be deleted:`
+          );
           result.files_to_delete.forEach((file, index) => {
             this.addFileOperation(`${index + 1}. DELETE: ${file.path}`);
           });
@@ -570,7 +581,9 @@ const model = {
         if (result.files_to_restore && result.files_to_restore.length > 0) {
           this.addFileOperation(`${result.files_to_restore.length} files would be restored:`);
           result.files_to_restore.forEach((file, index) => {
-            this.addFileOperation(`${index + 1}. RESTORE: ${file.original_path} -> ${file.target_path}`);
+            this.addFileOperation(
+              `${index + 1}. RESTORE: ${file.original_path} -> ${file.target_path}`
+            );
           });
         }
 
@@ -586,7 +599,9 @@ const model = {
         const restoreCount = result.restore_count || 0;
         const skippedCount = result.skipped_files?.length || 0;
 
-        this.addFileOperation(`\nSummary: ${deleteCount} to delete, ${restoreCount} to restore, ${skippedCount} skipped`);
+        this.addFileOperation(
+          `\nSummary: ${deleteCount} to delete, ${restoreCount} to restore, ${skippedCount} skipped`
+        );
         this.addFileOperation('Dry run completed successfully.');
       } else {
         this.error = result.error;
@@ -618,7 +633,7 @@ const model = {
 
       const response = await fetchApi('/backup_inspect', {
         method: 'POST',
-        body: formData
+        body: formData,
       });
 
       const result = await response.json();
@@ -657,10 +672,12 @@ const model = {
     // Check Agent Zero version compatibility
     // Note: Both backup and current versions are obtained via git.get_git_info()
     const backupVersion = this.backupMetadata.agent_zero_version;
-    const currentVersion = "current"; // Retrieved from git.get_git_info() on backend
+    const currentVersion = 'current'; // Retrieved from git.get_git_info() on backend
 
-    if (backupVersion !== currentVersion && backupVersion !== "development") {
-      warnings.push(`Backup created with Agent Zero ${backupVersion}, current version is ${currentVersion}`);
+    if (backupVersion !== currentVersion && backupVersion !== 'development') {
+      warnings.push(
+        `Backup created with Agent Zero ${backupVersion}, current version is ${currentVersion}`
+      );
     }
 
     // Check backup age
@@ -678,7 +695,10 @@ const model = {
     }
 
     if (warnings.length > 0) {
-      window.toastFrontendWarning(`Compatibility warnings: ${warnings.join(', ')}`, 'Backup Compatibility');
+      window.toastFrontendWarning(
+        `Compatibility warnings: ${warnings.join(', ')}`,
+        'Backup Compatibility'
+      );
     }
   },
 
@@ -703,7 +723,7 @@ const model = {
 
       const response = await fetchApi('/backup_restore', {
         method: 'POST',
-        body: formData
+        body: formData,
       });
 
       const result = await response.json();
@@ -711,7 +731,9 @@ const model = {
       if (result.success) {
         // Log deleted files if clean before restore was enabled
         if (result.deleted_files && result.deleted_files.length > 0) {
-          this.addFileOperation(`Clean before restore - Successfully deleted ${result.deleted_files.length} files:`);
+          this.addFileOperation(
+            `Clean before restore - Successfully deleted ${result.deleted_files.length} files:`
+          );
           result.deleted_files.forEach((file, index) => {
             this.addFileOperation(`${index + 1}. DELETED: ${file.path}`);
           });
@@ -721,7 +743,9 @@ const model = {
         // Log restored files
         this.addFileOperation(`Successfully restored ${result.restored_files.length} files:`);
         result.restored_files.forEach((file, index) => {
-          this.addFileOperation(`${index + 1}. RESTORED: ${file.archive_path} -> ${file.target_path}`);
+          this.addFileOperation(
+            `${index + 1}. RESTORED: ${file.archive_path} -> ${file.target_path}`
+          );
         });
 
         // Log skipped files
@@ -745,7 +769,9 @@ const model = {
         const skippedCount = result.skipped_files?.length || 0;
         const errorCount = result.errors?.length || 0;
 
-        this.addFileOperation(`\nRestore completed: ${deletedCount} deleted, ${restoredCount} restored, ${skippedCount} skipped, ${errorCount} errors`);
+        this.addFileOperation(
+          `\nRestore completed: ${deletedCount} deleted, ${restoredCount} restored, ${skippedCount} skipped, ${errorCount} errors`
+        );
         this.restoreResult = result;
         window.toastFrontendInfo('Restore completed successfully', 'Restore Status');
       } else {
@@ -818,8 +844,8 @@ const model = {
   formatDate(dateString) {
     if (!dateString) return 'Unknown';
     return new Date(dateString).toLocaleDateString();
-  }
+  },
 };
 
-const store = createStore("backupStore", model);
+const store = createStore('backupStore', model);
 export { store };
